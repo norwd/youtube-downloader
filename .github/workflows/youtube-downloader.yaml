@@ -60,7 +60,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.AUTO_DOWNLOAD_ZP }}
+          token: ${{ secrets.AUTO_DOWNLOAD }}
 
       - name: Determine Target
         id: target
@@ -80,16 +80,6 @@ jobs:
           --restrict-filenames --windows-filenames \
           --sleep-subtitles 50 --sleep-requests 50 --sleep-interval 50 --max-sleep-interval 60
 
-      # === PGP KEY SETUP AFTER THIS POINT. ====================================
-
-      - name: Setup GPG
-        uses: crazy-max/ghaction-import-gpg@v5
-        with:
-          gpg_private_key: ${{ secrets.AUTO_COMMIT_GPG_PRIVATE }}
-          passphrase: ${{ secrets.AUTO_COMMIT_GPG_PASSPHRASE }}
-          git_user_signingkey: true
-          git_commit_gpgsign: true
-
       - name: Push
         id: auto-commit
         uses: stefanzweifel/git-auto-commit-action@v4
@@ -100,7 +90,7 @@ jobs:
           commit_author: norwd <106889957+norwd@users.noreply.github.com>
           commit_user_name: norwd
           commit_user_email: 106889957+norwd@users.noreply.github.com
-          commit_options: -s -S
+          commit_options: --signoff
           commit_message: |
             Archive ${{ matrix.url }}
 
