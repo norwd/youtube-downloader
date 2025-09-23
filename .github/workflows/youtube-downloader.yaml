@@ -18,7 +18,17 @@ env:
   GH_TOKEN: ${{ secrets.AUTO_DOWNLOAD }}
 
 jobs:
+
+  target-repos:
+    name: "Find target repos"
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: ""
+        run: .
+
   youtube-dl:
+    needs: target-repos
     strategy:
       fail-fast: false
       max-parallel: 256
@@ -35,12 +45,28 @@ jobs:
           # or the worst audio-only format if there is no audio under 50 MB.
           - 'bestaudio[filesize<75M] / worstaudio'
 
-        # Playlist URLs
-        url: []
+        include:
+
+          # Discworld Audio Books
+          - repo: norwd/audiobooks-discworld
+            url: 'https://youtube.com/playlist?list=PLMrCSlHMwYVMLd9YUjSonrpVpv_yYx1qx'
+
+          # Discworld. Better Quality
+          - repo: norwd/audiobooks-discworld
+            url: 'https://youtube.com/playlist?list=PLMrCSlHMwYVMCvuhdLTDvrrsDpHPmtYq4'
+
+          # Zero Punctuation Complete Series (Escapist)
+          - repo: norwd/zp
+            url: 'https://youtube.com/playlist?list=PLAbMhAYRuCUhawCEV2oXZGrienoKTN16X'
+
+          # Fully Ramblomatic (Second Wind)
+          - repo: norwd/zp
+            url: 'https://youtube.com/playlist?list=PLUBKwq0XD0ueR3CXGUhGpsD1puLcYJPUp'
 
     env:
       FORMAT: ${{ matrix.format }}
       URL: ${{ matrix.url }}
+      REPO: ${{ matrix.repo }}
 
     name: "Run youtube-dl"
     runs-on: ubuntu-latest
@@ -61,10 +87,11 @@ jobs:
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.AUTO_DOWNLOAD }}
+          repository: ${{ env.REPO }}
 
       - name: Determine Target
         id: target
-        run: echo "branch=archive/${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-${{ strategy.job-index }}-$(openssl rand -hex 8)" | tee -a "${GITHUB_OUTPUT}"
+        run: echo "branch=archive/${REPO}/${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-${{ strategy.job-index }}-$(openssl rand -hex 8)" | tee -a "${GITHUB_OUTPUT}"
 
       - name: Download
         continue-on-error: true # Don't worry if it could not be mirrored, some individual files may fail but can be manually recovered later
@@ -98,7 +125,7 @@ jobs:
 
       - name: Create Pull Request
         if: ${{ steps.auto-commit.outputs.changes_detected == 'true' || steps.auto-commit-cleanup.outputs.changes_detected == 'true' }}
-        run: gh --repo "${{ github.repository }}" pr create --title "${TITLE}" --body "${BODY}" --base "${BASE}" --head "${HEAD}" | tee -a "${GITHUB_STEP_SUMMARY}" | tee -a pr.txt
+        run: gh --repo "${REPO}" pr create --title "${TITLE}" --body "${BODY}" --base "${BASE}" --head "${HEAD}" | tee -a "${GITHUB_STEP_SUMMARY}" | tee -a pr.txt
         env:
           BASE: ${{ github.ref_name }}
           HEAD: ${{ steps.target.outputs.branch }}
@@ -110,4 +137,4 @@ jobs:
         continue-on-error: true # Don't worry if it can't merge, the PR can be manually merged later
         timeout-minutes: 1
         if: ${{ steps.auto-commit.outputs.changes_detected == 'true' }}
-        run: until gh --repo "${{ github.repository }}" pr merge --merge "$(cat pr.txt)" ; do sleep 10 ; done
+        run: until gh --repo "${REPO}" pr merge --merge "$(cat pr.txt)" ; do sleep 10 ; done
