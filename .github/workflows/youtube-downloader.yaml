@@ -18,17 +18,7 @@ env:
   GH_TOKEN: ${{ secrets.AUTO_DOWNLOAD }}
 
 jobs:
-
-  target-repos:
-    name: "Find target repos"
-    runs-on: ubuntu-latest
-    steps:
-
-      - name: ""
-        run: .
-
   youtube-dl:
-    needs: target-repos
     strategy:
       fail-fast: false
       max-parallel: 256
