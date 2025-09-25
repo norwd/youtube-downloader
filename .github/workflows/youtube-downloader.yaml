@@ -27,7 +27,7 @@ jobs:
       - id: matrix
         name: "Generate Matrix JSON"
         run: |
-          jq '"json=\(.)"' << EOF | tee -a "${GITHUB_OUTPUT}"
+          jq --raw-output '"json=\(.)"' << EOF | tee -a "${GITHUB_OUTPUT}"
           {
             "include": [
               {
