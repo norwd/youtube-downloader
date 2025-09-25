@@ -36,6 +36,12 @@ jobs:
           # or the worst audio-only format if there is no audio under 50 MB.
           - 'bestaudio[filesize<75M] / worstaudio'
 
+        # Repos need to be explicitly listed to work properly
+        # https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/run-job-variations#expanding-or-adding-matrix-configurations
+        repo:
+          - norwd/audiobooks-discworld
+          - norwd/zp
+
         include:
 
           # Discworld Audio Books
