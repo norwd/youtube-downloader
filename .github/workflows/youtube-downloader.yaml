@@ -19,46 +19,70 @@ env:
   GH_TOKEN: ${{ secrets.AUTO_DOWNLOAD }}
 
 jobs:
+
+  generate-matrix:
+    runs-on: ubuntu-latest
+    steps:
+
+      - id: matrix
+        name: "Generate Matrix JSON"
+        run: |
+          jq '"json=\(.)"' << EOF | tee -a "${GITHUB_OUTPUT}"
+          {
+            "include": [
+              {
+                "format": "best[filesize<75M] / worst",
+                "repo": "norwd/audiobooks-discworld",
+                "url": "https://youtube.com/playlist?list=PLMrCSlHMwYVMLd9YUjSonrpVpv_yYx1qx"
+              },
+              {
+                "format": "bestaudio[filesize<75M] / worstaudio",
+                "repo": "norwd/audiobooks-discworld",
+                "url": "https://youtube.com/playlist?list=PLMrCSlHMwYVMLd9YUjSonrpVpv_yYx1qx"
+              },
+              {
+                "format": "best[filesize<75M] / worst",
+                "repo": "norwd/audiobooks-discworld",
+                "url": "https://youtube.com/playlist?list=PLMrCSlHMwYVMCvuhdLTDvrrsDpHPmtYq4"
+              },
+              {
+                "format": "bestaudio[filesize<75M] / worstaudio",
+                "repo": "norwd/audiobooks-discworld",
+                "url": "https://youtube.com/playlist?list=PLMrCSlHMwYVMCvuhdLTDvrrsDpHPmtYq4"
+              },
+              {
+                "format": "best[filesize<75M] / worst",
+                "repo": "norwd/zp",
+                "url": "https://youtube.com/playlist?list=PLAbMhAYRuCUhawCEV2oXZGrienoKTN16X"
+              },
+              {
+                "format": "bestaudio[filesize<75M] / worstaudio",
+                "repo": "norwd/zp",
+                "url": "https://youtube.com/playlist?list=PLAbMhAYRuCUhawCEV2oXZGrienoKTN16X"
+              },
+              {
+                "format": "best[filesize<75M] / worst",
+                "repo": "norwd/zp",
+                "url": "https://youtube.com/playlist?list=PLUBKwq0XD0ueR3CXGUhGpsD1puLcYJPUp"
+              },
+              {
+                "format": "bestaudio[filesize<75M] / worstaudio",
+                "repo": "norwd/zp",
+                "url": "https://youtube.com/playlist?list=PLUBKwq0XD0ueR3CXGUhGpsD1puLcYJPUp"
+              }
+            ]
+          }
+          EOF
+
+    outputs:
+      json: ${{ steps.matrix.outputs.json }}
+
   youtube-dl:
+    needs: generate-matrix
     strategy:
       fail-fast: false
       max-parallel: 256
-      matrix:
-
-        # https://github.com/yt-dlp/yt-dlp?tab=readme-ov-file#format-selection
-        format:
-
-          # Download the best video (that also has audio) but no bigger than 50 MB,
-          # or the worst video (that also has audio) if there is no video under 50 MB.
-          - 'best[filesize<75M] / worst'
-
-          # Download the best audio-only format that is no bigger than 50 MB,
-          # or the worst audio-only format if there is no audio under 50 MB.
-          - 'bestaudio[filesize<75M] / worstaudio'
-
-        # Repos need to be explicitly listed to work properly
-        # https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/run-job-variations#expanding-or-adding-matrix-configurations
-        repo:
-          - norwd/audiobooks-discworld
-          - norwd/zp
-
-        include:
-
-          # Discworld Audio Books
-          - repo: norwd/audiobooks-discworld
-            url: 'https://youtube.com/playlist?list=PLMrCSlHMwYVMLd9YUjSonrpVpv_yYx1qx'
-
-          # Discworld. Better Quality
-          - repo: norwd/audiobooks-discworld
-            url: 'https://youtube.com/playlist?list=PLMrCSlHMwYVMCvuhdLTDvrrsDpHPmtYq4'
-
-          # Zero Punctuation Complete Series (Escapist)
-          - repo: norwd/zp
-            url: 'https://youtube.com/playlist?list=PLAbMhAYRuCUhawCEV2oXZGrienoKTN16X'
-
-          # Fully Ramblomatic (Second Wind)
-          - repo: norwd/zp
-            url: 'https://youtube.com/playlist?list=PLUBKwq0XD0ueR3CXGUhGpsD1puLcYJPUp'
+      matrix: ${{ fromJSON(needs.generate-matrix.outputs.json) }}
 
     env:
       FORMAT: ${{ matrix.format }}
