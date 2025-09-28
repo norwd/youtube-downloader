@@ -85,7 +85,7 @@ jobs:
         timeout-minutes: 345 # max time out is 360, quit and at least try to commit / push what was downloaded so far
         run: |
           yt-dlp "${URL}" \
-          --max-downloads \
+          --max-downloads 10 \
           --playlist-random \
           --no-abort-on-error \
           --max-filesize 100M \
