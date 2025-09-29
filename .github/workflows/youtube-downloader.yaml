@@ -31,7 +31,7 @@ jobs:
 
       - id: list-environments
         name: "List Environments"
-        run: gh api "${ENDPOINT}" --jq "${JQ_QUERY}"
+        run: gh api "${ENDPOINT}" --jq "${JQ_QUERY}" | tee -a "${GITHUB_OUTPUT}"
         env:
           ENDPOINT: '/repos/${{ github.repository }}/environments'
           JQ_QUERY: '"json=\([ .environments[].name ])"'
