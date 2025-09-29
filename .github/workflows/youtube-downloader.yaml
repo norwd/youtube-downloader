@@ -23,32 +23,34 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+
+  list-environments:
+    name: "List Environments"
+    runs-on: ubuntu-latest
+    steps:
+
+      - id: list-environments
+        name: "List Environments"
+        run: gh api "${ENDPOINT}" --jq "${JQ_QUERY}"
+        env:
+          ENDPOINT: '/repos/${{ github.repository }}/environments'
+          JQ_QUERY: '"json=\([ .environments[].name ])"'
+
+    outputs:
+      json: ${{ steps.list-environments.outputs.json }}
+
   youtube-dl:
+    needs: list-environments
+    environment: ${{ matrix.environment }}
     strategy:
       fail-fast: false
       max-parallel: 256
       matrix:
-        include:
-
-          # Discworld Audio Books by Story Time (audio only)
-          - url: https://youtube.com/playlist?list=PLMrCSlHMwYVMLd9YUjSonrpVpv_yYx1qx
-            repo: norwd/audiobooks-discworld
-
-          # Discworld Better Quality by Story Time (audio only)
-          - url: https://youtube.com/playlist?list=PLMrCSlHMwYVMCvuhdLTDvrrsDpHPmtYq4
-            repo: norwd/audiobooks-discworld
-
-          # Zero Punctuation by The Escapist (video with audio or just audio)
-          - url: https://youtube.com/playlist?list=PLAbMhAYRuCUhawCEV2oXZGrienoKTN16X
-            repo: norwd/zp
-
-          # Fully Ramblomatic by Second Wind (video with audio or just audio)
-          - url: https://youtube.com/playlist?list=PLUBKwq0XD0ueR3CXGUhGpsD1puLcYJPUp
-            repo: norwd/zp
+        environment: ${{ fromJSON(steps.list-environments.outputs.json) }}
 
     env:
-      URL: ${{ matrix.url }}
-      REPO: ${{ matrix.repo }}
+      URL: ${{ secrets.url }}
+      REPO: ${{ vars.repository }}
       FORMAT: |
         ${{ join(fromJSON('[
           "best[filesize<99M]",
