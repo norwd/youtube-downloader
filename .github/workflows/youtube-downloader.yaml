@@ -33,27 +33,30 @@ jobs:
           # Discworld Audio Books by Story Time (audio only)
           - url: https://youtube.com/playlist?list=PLMrCSlHMwYVMLd9YUjSonrpVpv_yYx1qx
             repo: norwd/audiobooks-discworld
-            format: bestaudio[filesize<99M] / bestaudio[filesize_approx<99M] / worstaudio*
 
           # Discworld Better Quality by Story Time (audio only)
           - url: https://youtube.com/playlist?list=PLMrCSlHMwYVMCvuhdLTDvrrsDpHPmtYq4
             repo: norwd/audiobooks-discworld
-            format: bestaudio[filesize<99M] / bestaudio[filesize_approx<99M] / worstaudio*
 
           # Zero Punctuation by The Escapist (video with audio or just audio)
           - url: https://youtube.com/playlist?list=PLAbMhAYRuCUhawCEV2oXZGrienoKTN16X
             repo: norwd/zp
-            format: best[filesize<99M] / best[filesize_approx<99M] / bestaudio[filesize<99M] / bestaudio[filesize_approx<99M] / worstaudio*
 
           # Fully Ramblomatic by Second Wind (video with audio or just audio)
           - url: https://youtube.com/playlist?list=PLUBKwq0XD0ueR3CXGUhGpsD1puLcYJPUp
             repo: norwd/zp
-            format: best[filesize<99M] / best[filesize_approx<99M] / bestaudio[filesize<99M] / bestaudio[filesize_approx<99M] / worstaudio*
 
     env:
-      FORMAT: ${{ matrix.format }}
       URL: ${{ matrix.url }}
       REPO: ${{ matrix.repo }}
+      FORMAT: |
+        ${{ join(fromJSON('[
+          "best[filesize<99M]",
+          "best[filesize_approx<99M]",
+          "bestaudio[filesize<99M]",
+          "bestaudio[filesize_approx<99M]",
+          "worstaudio*",
+        ]'), ' / ') }}
 
     name: "Run youtube-dl"
     runs-on: ubuntu-latest
@@ -85,7 +88,6 @@ jobs:
         timeout-minutes: 345 # max time out is 360, quit and at least try to commit / push what was downloaded so far
         run: |
           yt-dlp "${URL}" \
-          --max-downloads 10 \
           --playlist-random \
           --no-abort-on-error \
           --max-filesize 100M \
@@ -94,6 +96,9 @@ jobs:
           --concurrent-fragments "$(nproc)" \
           --restrict-filenames --windows-filenames \
           --sleep-subtitles 50 --sleep-requests 50 --sleep-interval 50 --max-sleep-interval 60
+
+      - name: Status
+        run: git status
 
       - name: Push
         id: auto-commit
