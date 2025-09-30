@@ -104,8 +104,8 @@ jobs:
       - name: Status
         run: git status
 
-      - name: Compress
-        run: find . -size +100M | grep --invert-match '\.git' | xargs -IFILE bzip2 --best --compress FILE
+      - name: Split Files greater than 100 Megabytes
+        run: find . -size +100M | grep --invert-match '\.git' | xargs -IFILE split --bytes 100m --hex-suffixes --additional-suffix .split "FILE" "FILE."
 
       - name: Status
         run: git status
