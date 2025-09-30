@@ -57,7 +57,12 @@ jobs:
           "best[filesize_approx<99M]",
           "bestaudio[filesize<99M]",
           "bestaudio[filesize_approx<99M]",
-          "worstaudio*",
+          "ogg[filesize_approx<150M]",
+          "webm[filesize_approx<150M]",
+          "mp3[filesize_approx<150M]",
+          "m4a[filesize_approx<150M]",
+          "aac[filesize_approx<150M]",
+          "wav",
         ]'), ' / ') }}
 
     name: "Run youtube-dl"
@@ -92,12 +97,24 @@ jobs:
           yt-dlp "${URL}" \
           --playlist-random \
           --no-abort-on-error \
-          --max-filesize 100M \
           --format "${FORMAT}" \
           --proxy socks5h://localhost:9050 \
           --concurrent-fragments "$(nproc)" \
           --restrict-filenames --windows-filenames \
           --sleep-subtitles 50 --sleep-requests 50 --sleep-interval 50 --max-sleep-interval 60
+
+      - name: Status
+        run: git status
+
+      - name: Compress
+        run: find . -size +100M | grep --invert-match '\.git' | xargs -IFILE bzip2 --best --compress FILE
+
+      - name: Status
+        run: git status
+
+      - name: Remove Files Over 100 Megabytes
+        working-directory: ${{ steps.target.outputs.directory }}
+        run: find . -size +100M | grep --invert-match '\.git' | xargs rm -rf
 
       - name: Status
         run: git status
