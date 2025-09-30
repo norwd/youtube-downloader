@@ -62,7 +62,7 @@ jobs:
           "mp3[filesize_approx<150M]",
           "m4a[filesize_approx<150M]",
           "aac[filesize_approx<150M]",
-          "wav",
+          "bestaudio",
         ]'), ' / ') }}
 
     name: "Run youtube-dl"
