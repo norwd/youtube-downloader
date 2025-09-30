@@ -62,7 +62,7 @@ jobs:
           "mp3[filesize_approx<150M]",
           "m4a[filesize_approx<150M]",
           "aac[filesize_approx<150M]",
-          "bestaudio",
+          "opus",
         ]'), ' / ') }}
 
     name: "Run youtube-dl"
@@ -76,9 +76,7 @@ jobs:
           curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o ~/.local/bin/yt-dlp
           chmod a+rx ~/.local/bin/yt-dlp
           sudo apt install -y tor
-
-      - name: Version
-        run: yt-dlp --version
+          yt-dlp --version
 
       - name: Checkout
         uses: actions/checkout@v3
@@ -113,7 +111,6 @@ jobs:
         run: git status
 
       - name: Remove Files Over 100 Megabytes
-        working-directory: ${{ steps.target.outputs.directory }}
         run: find . -size +100M | grep --invert-match '\.git' | xargs rm -rf
 
       - name: Status
