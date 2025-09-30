@@ -56,13 +56,7 @@ jobs:
           "best[filesize<99M]",
           "best[filesize_approx<99M]",
           "bestaudio[filesize<99M]",
-          "bestaudio[filesize_approx<99M]",
-          "ogg[filesize_approx<150M]",
-          "webm[filesize_approx<150M]",
-          "mp3[filesize_approx<150M]",
-          "m4a[filesize_approx<150M]",
-          "aac[filesize_approx<150M]",
-          "opus",
+          "bestaudio",
         ]'), ' / ') }}
 
     name: "Run youtube-dl"
@@ -105,13 +99,13 @@ jobs:
         run: git status
 
       - name: Split Files greater than 100 Megabytes
-        run: find . -size +100M | grep --invert-match '\.git' | xargs -IFILE split --bytes 100m --hex-suffixes --additional-suffix .split "FILE" "FILE."
+        run: find . -size +100M | grep --invert-match '\.git' | xargs --verbose -IFILE split --bytes 100m --hex-suffixes --additional-suffix .split "FILE" "FILE."
 
       - name: Status
         run: git status
 
       - name: Remove Files Over 100 Megabytes
-        run: find . -size +100M | grep --invert-match '\.git' | xargs rm -rf
+        run: find . -size +100M | grep --invert-match '\.git' | xargs --verbose -IFILE rm -rf FILE
 
       - name: Status
         run: git status
