@@ -88,7 +88,6 @@ jobs:
         run: |
           yt-dlp "${URL}" \
           --playlist-random \
-          --max-downloads 10 \
           --no-abort-on-error \
           --format "${FORMAT}" \
           --proxy socks5h://localhost:9050 \
@@ -100,15 +99,13 @@ jobs:
         run: git status
 
       - name: Split Files greater than 100 Megabytes
-        continue-on-error: true
-        run: find . -size +100M | grep --invert-match '\.git' | xargs --verbose -IFILE split --bytes 100m --hex-suffixes --additional-suffix .split "FILE" "FILE."
+        run: find . -size +100M -not -path './.git/*' | xargs --verbose -IFILE split --bytes 100m --hex-suffixes --additional-suffix .split "FILE" "FILE."
 
       - name: Status
         run: git status
 
       - name: Remove Files Over 100 Megabytes
-        continue-on-error: true
-        run: find . -size +100M | grep --invert-match '\.git' | xargs --verbose -IFILE rm -rf FILE
+        run: find . -size +100M -not -path './.git/*' | xargs --verbose -IFILE rm -rf FILE
 
       - name: Status
         run: git status
