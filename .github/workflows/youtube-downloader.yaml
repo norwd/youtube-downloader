@@ -76,6 +76,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
+          ref: ${{ secrets.ref || 'main' }}
           token: ${{ secrets.AUTO_DOWNLOAD }}
           repository: ${{ env.REPO }}
 
