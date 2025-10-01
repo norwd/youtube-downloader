@@ -134,7 +134,7 @@ jobs:
         env:
           BASE: ${{ github.ref_name }}
           HEAD: ${{ steps.target.outputs.branch }}
-          TITLE: "Archive ${{ matrix.url }}"
+          TITLE: "Archive ${{ env.url }}"
           BODY: |
             **NOTE:** This is an automatic commit. See the youtube-downloader.yaml workflow.
 
