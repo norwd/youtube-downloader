@@ -125,7 +125,7 @@ jobs:
           commit_user_email: 106889957+norwd@users.noreply.github.com
           commit_options: --signoff
           commit_message: |
-            Archive ${{ matrix.url }}
+            Archive ${{ env.URL }}
 
             **NOTE:** This is an automatic commit. See the youtube-downloader.yaml workflow.
 
@@ -135,7 +135,7 @@ jobs:
         env:
           BASE: ${{ github.ref_name }}
           HEAD: ${{ steps.target.outputs.branch }}
-          TITLE: "Archive ${{ env.url }}"
+          TITLE: "Archive ${{ env.URL }}"
           BODY: |
             **NOTE:** This is an automatic commit. See the youtube-downloader.yaml workflow.
 
