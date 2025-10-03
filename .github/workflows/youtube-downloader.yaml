@@ -90,7 +90,7 @@ jobs:
         run: |
           yt-dlp "${URL}" \
           --playlist-random \
-          --max-downloads 10 \
+          --max-downloads 5 \
           --no-abort-on-error \
           --format "${FORMAT}" \
           --proxy socks5h://localhost:9050 \
