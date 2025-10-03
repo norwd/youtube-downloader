@@ -37,7 +37,7 @@ jobs:
         ]'), ' / ') }}
 
     name: "Run youtube-dl"
-    runs-on: ubuntu-lastest
+    runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     steps:
 
