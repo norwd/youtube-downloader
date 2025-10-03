@@ -43,7 +43,7 @@ jobs:
 
       - id: enumerate
         name: Enumerate
-        run: yt-dlp "${URL}" --proxy socks5h://localhost:9050 --print webpage_url --quiet --verbose --ignore-errors --flat-playlist | jq --raw-input | jq --slurp --raw-output '"urls=\(.[:1])"' | tee -a "${GITHUB_OUTPUT}"
+        run: yt-dlp "${URL}" --proxy socks5h://localhost:9050 --print webpage_url --quiet --verbose --ignore-errors --flat-playlist | jq --raw-input | sort --random-sort | jq --slurp --raw-output '"urls=\(.[:5])"' | tee -a "${GITHUB_OUTPUT}"
         env:
           URL: ${{ secrets.url }}
 
