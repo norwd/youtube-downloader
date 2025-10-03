@@ -21,7 +21,7 @@ env:
   GH_TOKEN: ${{ secrets.AUTO_DOWNLOAD }}
 
 concurrency:
-  group: ${{ github.workflow_ref }}
+  group: ${{ github.workflow_ref }}-${{ inputs.environment }}
   cancel-in-progress: false
 
 jobs:
