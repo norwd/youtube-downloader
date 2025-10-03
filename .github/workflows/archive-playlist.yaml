@@ -65,6 +65,6 @@ jobs:
         run: gh workflow run "${WORKFLOW}" --ref "${REF}" --raw-field environment="${ENV}" --raw-field url="${URL}"
         env:
           WORKFLOW: archive-video.yaml
-          REF: ${{ github.sha }}
+          REF: ${{ github.ref_name }}
           ENV: ${{ inputs.environment }}
           URL: ${{ matrix.url }}
