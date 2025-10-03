@@ -9,12 +9,12 @@ on:
       environment:
         type: environment
         required: true
-        description: Environment to run tests against
+        description: Environment to archive the video in
 
       url:
         type: string
         required: true
-        description: A username passed from the caller workflow
+        description: Url of the video to archive
 
 env:
   GH_TOKEN: ${{ secrets.AUTO_DOWNLOAD }}
