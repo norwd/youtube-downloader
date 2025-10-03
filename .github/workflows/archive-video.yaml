@@ -27,7 +27,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  youtube-dl:
+  archive-video:
     env:
       URL: ${{ inputs.url }}
       REPO: ${{ vars.repository }}
