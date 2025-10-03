@@ -15,10 +15,11 @@ defaults:
     shell: bash
 
 env:
+  GH_REPO: ${{ github.repository }}
   GH_TOKEN: ${{ secrets.AUTO_DOWNLOAD }}
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow_ref }}
   cancel-in-progress: false
 
 jobs:
