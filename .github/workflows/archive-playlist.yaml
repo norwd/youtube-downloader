@@ -1,0 +1,70 @@
+---
+
+name: "Archive Playlist"
+run-name: "Archive Playlist"
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: environment
+        required: true
+        description: |
+          Environment to run tests against
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  GH_REPO: ${{ github.repository }}
+  GH_TOKEN: ${{ secrets.AUTO_DOWNLOAD }}
+
+concurrency:
+  group: ${{ github.workflow_ref }}
+  cancel-in-progress: false
+
+jobs:
+
+  enumerate-playlist:
+    name: Enumerate Playlist
+    runs-on: ubuntu-latest
+    timeout-minutes: 1000 # Max time out is lower, but allow for future increase
+    environment: ${{ inputs.environment }}
+    steps:
+
+      - name: Install
+        run: |
+          mkdir -p ~/.local/bin
+          echo "~/.local/bin" >> "$GITHUB_PATH"
+          curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o ~/.local/bin/yt-dlp
+          chmod a+rx ~/.local/bin/yt-dlp
+          sudo apt install -y tor
+
+      - id: enumerate
+        name: Enumerate
+        run: yt-dlp "${URL}" --proxy socks5h://localhost:9050 --print webpage_url --quiet --verbose --ignore-errors --flat-playlist | jq --raw-input | jq --slurp --raw-output '"urls=\(.[:5])"' | tee -a "${GITHUB_OUTPUT}"
+        env:
+          URL: ${{ secrets.url }}
+
+    outputs:
+      urls: ${{ steps.enumerate.outputs.urls }}
+
+  archive-video:
+    name: "Archive Video"
+    needs: enumerate-playlist
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 256
+      matrix:
+        url: ${{ fromJSON(needs.enumerate-playlist.outputs.urls) }}
+
+    steps:
+      - name: "Run Workflow to Archive Video"
+        run: gh workflow run "${WORKFLOW}" --ref "${REF}" --raw-field environment="${ENV}" --raw-field url="${URL}"
+        env:
+          WORKFLOW: archive-video.yaml
+          REF: ${{ github.sha }}
+          ENV: ${{ inputs.environment }}
+          URL: ${{ matrix.url }}

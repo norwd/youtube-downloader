@@ -4,7 +4,6 @@ name: "Run youtube downloader"
 run-name: "Run youtube downloader"
 
 on:
-  workflow_call:
   workflow_dispatch:
   schedule: [ cron: '18 16 * * 1' ]
   push:
@@ -16,10 +15,11 @@ defaults:
     shell: bash
 
 env:
+  GH_REPO: ${{ github.repository }}
   GH_TOKEN: ${{ secrets.AUTO_DOWNLOAD }}
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow_ref }}
   cancel-in-progress: false
 
 jobs:
@@ -39,7 +39,7 @@ jobs:
     outputs:
       json: ${{ steps.list-environments.outputs.json }}
 
-  youtube-dl:
+  archive-playlist:
     needs: list-environments
     environment: ${{ matrix.environment }}
     strategy:
@@ -48,99 +48,13 @@ jobs:
       matrix:
         environment: ${{ fromJSON(needs.list-environments.outputs.json) }}
 
-    env:
-      URL: ${{ secrets.url }}
-      REPO: ${{ vars.repository }}
-      FORMAT: |
-        ${{ join(fromJSON('[
-          "best[filesize<99M]",
-          "best[filesize_approx<99M]",
-          "bestaudio[filesize<99M]",
-          "bestaudio",
-        ]'), ' / ') }}
-
-    name: "Run youtube-dl"
+    name: "Archive Playlist"
     runs-on: ubuntu-latest
     steps:
 
-      - name: Install
-        run: |
-          git config --global http.postBuffer 524288000
-          mkdir -p ~/.local/bin
-          echo "~/.local/bin" >> "$GITHUB_PATH"
-          curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o ~/.local/bin/yt-dlp
-          chmod a+rx ~/.local/bin/yt-dlp
-          sudo apt install -y tor
-          yt-dlp --version
-
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ secrets.ref || 'main' }}
-          token: ${{ secrets.AUTO_DOWNLOAD }}
-          repository: ${{ env.REPO }}
-
-      - name: Determine Target
-        id: target
-        run: echo "branch=archive/${REPO}/${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-${{ strategy.job-index }}-$(openssl rand -hex 8)" | tee -a "${GITHUB_OUTPUT}"
-
-      - name: Download
-        continue-on-error: true # Don't worry if it could not be mirrored, some individual files may fail but can be manually recovered later
-        timeout-minutes: 345 # max time out is 360, quit and at least try to commit / push what was downloaded so far
-        run: |
-          yt-dlp "${URL}" \
-          --playlist-random \
-          --max-downloads 5 \
-          --no-abort-on-error \
-          --format "${FORMAT}" \
-          --proxy socks5h://localhost:9050 \
-          --concurrent-fragments "$(nproc)" \
-          --restrict-filenames --windows-filenames \
-          --sleep-subtitles 50 --sleep-requests 50 --sleep-interval 50 --max-sleep-interval 60
-
-      - name: Status
-        run: git status
-
-      - name: Split Files greater than 100 Megabytes
-        run: find . -size +100M -not -path './.git/*' | xargs --verbose -IFILE split --bytes 100m --hex-suffixes --additional-suffix .split "FILE" "FILE."
-
-      - name: Status
-        run: git status
-
-      - name: Remove Files Over 100 Megabytes
-        run: find . -size +100M -not -path './.git/*' | xargs --verbose -IFILE rm -rf FILE
-
-      - name: Status
-        run: git status
-
-      - name: Push
-        id: auto-commit
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          file_pattern: .
-          create_branch: true
-          branch: ${{ steps.target.outputs.branch }}
-          commit_author: norwd <106889957+norwd@users.noreply.github.com>
-          commit_user_name: norwd
-          commit_user_email: 106889957+norwd@users.noreply.github.com
-          commit_options: --signoff
-          commit_message: |
-            Archive ${{ env.URL }}
-
-            **NOTE:** This is an automatic commit. See the youtube-downloader.yaml workflow.
-
-      - name: Create Pull Request
-        if: ${{ steps.auto-commit.outputs.changes_detected == 'true' || steps.auto-commit-cleanup.outputs.changes_detected == 'true' }}
-        run: gh --repo "${REPO}" pr create --title "${TITLE}" --body "${BODY}" --base "${BASE}" --head "${HEAD}" | tee -a "${GITHUB_STEP_SUMMARY}" | tee -a pr.txt
+      - name: "Run Workflow to Archive Playlist"
+        run: gh workflow run "${WORKFLOW}" --ref "${REF}" --raw-field environment="${ENV}"
         env:
-          BASE: ${{ github.ref_name }}
-          HEAD: ${{ steps.target.outputs.branch }}
-          TITLE: "Archive ${{ env.URL }}"
-          BODY: |
-            **NOTE:** This is an automatic commit. See the youtube-downloader.yaml workflow.
-
-      - name: Approve Pull Request
-        continue-on-error: true # Don't worry if it can't merge, the PR can be manually merged later
-        timeout-minutes: 1
-        if: ${{ steps.auto-commit.outputs.changes_detected == 'true' }}
-        run: until gh --repo "${REPO}" pr merge --merge "$(cat pr.txt)" ; do sleep 10 ; done
+          WORKFLOW: archive-playlist.yaml
+          REF: ${{ github.sha }}
+          ENV: ${{ matrix.environment }}
