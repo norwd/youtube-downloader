@@ -17,6 +17,7 @@ defaults:
     shell: bash
 
 env:
+  GH_REPO: ${{ github.repository }}
   GH_TOKEN: ${{ secrets.AUTO_DOWNLOAD }}
 
 concurrency:
