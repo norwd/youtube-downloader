@@ -8,7 +8,10 @@ on:
   schedule: [ cron: '18 16 * * 1' ]
   push:
     branches: [main]
-    paths: [.github/workflows/youtube-downloader.yaml]
+    paths:
+      - .github/workflows/archive-video.yaml
+      - .github/workflows/archive-playlist.yaml
+      - .github/workflows/youtube-downloader.yaml
 
 defaults:
   run:
