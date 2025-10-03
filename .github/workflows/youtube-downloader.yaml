@@ -56,5 +56,5 @@ jobs:
         run: gh workflow run "${WORKFLOW}" --ref "${REF}" --raw-field environment="${ENV}"
         env:
           WORKFLOW: archive-playlist.yaml
-          REF: ${{ github.sha }}
+          REF: ${{ github.ref_name }}
           ENV: ${{ matrix.environment }}
