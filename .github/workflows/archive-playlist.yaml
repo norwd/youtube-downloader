@@ -31,6 +31,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 1000 # Max time out is lower, but allow for future increase
     environment: ${{ inputs.environment }}
+    env:
+      URL: ${{ secrets.url }}
+    
     steps:
 
       - name: Install
@@ -43,9 +46,17 @@ jobs:
 
       - id: enumerate
         name: Enumerate
-        run: yt-dlp "${URL}" --proxy socks5h://localhost:9050 --print webpage_url --quiet --verbose --ignore-errors --flat-playlist | jq --raw-input | sort --random-sort | jq --slurp --raw-output '"urls=\(.[:10])"' | tee -a "${GITHUB_OUTPUT}"
-        env:
-          URL: ${{ secrets.url }}
+        run: |
+          yt-dlp "${URL}" \
+            --proxy socks5h://localhost:9050 \
+            --print webpage_url \
+            --quiet --verbose \
+            --ignore-errors \
+            --flat-playlist |
+          jq --raw-input |
+          sort --random-sort |
+          jq --slurp --raw-output '"urls=\(.[])"' |
+          tee -a "${GITHUB_OUTPUT}"
 
     outputs:
       urls: ${{ steps.enumerate.outputs.urls }}
