@@ -62,8 +62,6 @@ jobs:
         run: echo "branch=archive/${REPO}/${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-${{ strategy.job-index }}-$(openssl rand -hex 8)" | tee -a "${GITHUB_OUTPUT}"
 
       - name: Download
-        continue-on-error: true # Don't worry if it could not be mirrored, some individual files may fail but can be manually recovered later
-        timeout-minutes: 345 # max time out is 360, quit and at least try to commit / push what was downloaded so far
         run: |
           yt-dlp "${URL}" \
             --no-simulate \
