@@ -66,11 +66,12 @@ jobs:
         timeout-minutes: 345 # max time out is 360, quit and at least try to commit / push what was downloaded so far
         run: |
           yt-dlp "${URL}" \
+            --no-simulate \
             --no-abort-on-error \
-            --format "${FORMAT}" \
             --proxy socks5h://localhost:9050 \
             --concurrent-fragments "$(nproc)" \
             --restrict-filenames --windows-filenames \
+            --format "${FORMAT}" --format-sort "filesize:100M" \
             --sleep-subtitles 50 --sleep-requests 50 --sleep-interval 50 --max-sleep-interval 60
 
       - name: Status
