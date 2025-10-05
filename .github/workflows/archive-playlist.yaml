@@ -55,7 +55,7 @@ jobs:
             --flat-playlist |
           jq --raw-input |
           sort --random-sort |
-          jq --slurp --raw-output '"urls=\(.[:255])"' |
+          jq --slurp --raw-output '"urls=\(.[:5])"' |
           tee -a "${GITHUB_OUTPUT}"
 
     outputs:
