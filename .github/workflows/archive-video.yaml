@@ -31,7 +31,6 @@ jobs:
       FORMAT: |
         ${{ join(fromJSON('[
           "best[filesize<99M]",
-          "best[filesize_approx<99M]",
           "bestaudio[filesize<99M]",
           "bestaudio",
         ]'), ' / ') }}
