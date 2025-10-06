@@ -98,7 +98,7 @@ jobs:
 
       - name: Push
         run: |
-          git checkout -b "${{ steps.target.outputs.branch }}"
+          git checkout -tb "${{ steps.target.outputs.branch }}"
           git config user.name "norwd"
           git config user.email "106889957+norwd@users.noreply.github.com"
           git add .
