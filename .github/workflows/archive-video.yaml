@@ -98,7 +98,7 @@ jobs:
 
       - name: Push
         run: |
-          git checkout -t direct -b "${{ steps.target.outputs.branch }}"
+          git checkout -b "${{ steps.target.outputs.branch }}"
           git config user.name "norwd"
           git config user.email "106889957+norwd@users.noreply.github.com"
           git add .
@@ -115,7 +115,7 @@ jobs:
 
           **NOTE:** This is an automatic commit. See the archive-video.yaml workflow.
           EOF
-          git push
+          git push -u origin "${{ steps.target.outputs.branch }}"
 
       - name: Create Pull Request
         run: gh pr create --fill --base "${BASE}" | tee -a "${GITHUB_STEP_SUMMARY}" | tee -a pr.txt
