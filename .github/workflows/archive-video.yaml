@@ -59,7 +59,7 @@ jobs:
 
       - name: Determine Target
         id: target
-        run: echo "branch=archive/${REPO}/${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-${{ strategy.job-index }}-$(openssl rand -hex 8)" | tee -a "${GITHUB_OUTPUT}"
+        run: echo "branch=archive/${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-${{ strategy.job-index }}-$(openssl rand -hex 8)" | tee -a "${GITHUB_OUTPUT}"
 
       - name: Download
         id: download
@@ -97,49 +97,32 @@ jobs:
         run: git status
 
       - name: Push
-        id: auto-commit
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          file_pattern: .
-          create_branch: true
-          branch: ${{ steps.target.outputs.branch }}
-          commit_author: norwd <106889957+norwd@users.noreply.github.com>
-          commit_user_name: norwd
-          commit_user_email: 106889957+norwd@users.noreply.github.com
-          commit_options: --signoff
-          commit_message: |
-            Archive ${{ steps.download.outputs.webpage_url }}
+        run: |
+          git checkout "${{ steps.target.outputs.branch }}"
+          git config user.name "norwd"
+          git config user.email "106889957+norwd@users.noreply.github.com"
+          git add .
+          git commit --signoff --file=- << EOF
+          Archive ${{ steps.download.outputs.webpage_url }}
 
-            * ID: ${{ steps.download.outputs.id }}
-            * URL: ${{ steps.download.outputs.webpage_url }}
-            * License: ${{ steps.download.outputs.license }}
-            * Filename: ${{ steps.download.outputs.filename }}
-            * Title: ${{ steps.download.outputs.title }}
-            * Title (alt): ${{ steps.download.outputs.alt_title }}
-            * Title (full): ${{ steps.download.outputs.fulltitle }}
+          * ID: ${{ steps.download.outputs.id }}
+          * URL: ${{ steps.download.outputs.webpage_url }}
+          * License: ${{ steps.download.outputs.license }}
+          * Filename: ${{ steps.download.outputs.filename }}
+          * Title: ${{ steps.download.outputs.title }}
+          * Title (alt): ${{ steps.download.outputs.alt_title }}
+          * Title (full): ${{ steps.download.outputs.fulltitle }}
 
-            **NOTE:** This is an automatic commit. See the archive-video.yaml workflow.
+          **NOTE:** This is an automatic commit. See the archive-video.yaml workflow.
+          EOF
+          git push
 
       - name: Create Pull Request
-        if: ${{ steps.auto-commit.outputs.changes_detected == 'true' || steps.auto-commit-cleanup.outputs.changes_detected == 'true' }}
-        run: gh --repo "${REPO}" pr create --title "${TITLE}" --body "${BODY}" --base "${BASE}" --head "${HEAD}" | tee -a "${GITHUB_STEP_SUMMARY}" | tee -a pr.txt
+        run: gh pr create --fill --base "${BASE}" | tee -a "${GITHUB_STEP_SUMMARY}" | tee -a pr.txt
         env:
           BASE: ${{ github.ref_name }}
-          HEAD: ${{ steps.target.outputs.branch }}
-          TITLE: "Archive ${{ steps.download.outputs.webpage_url }}"
-          BODY: |
-            * ID: ${{ steps.download.outputs.id }}
-            * URL: ${{ steps.download.outputs.webpage_url }}
-            * License: ${{ steps.download.outputs.license }}
-            * Filename: ${{ steps.download.outputs.filename }}
-            * Title: ${{ steps.download.outputs.title }}
-            * Title (alt): ${{ steps.download.outputs.alt_title }}
-            * Title (full): ${{ steps.download.outputs.fulltitle }}
-
-            **NOTE:** This is an automatic commit. See the archive-video.yaml workflow.
 
       - name: Approve Pull Request
         continue-on-error: true # Don't worry if it can't merge, the PR can be manually merged later
         timeout-minutes: 1
-        if: ${{ steps.auto-commit.outputs.changes_detected == 'true' }}
-        run: until gh --repo "${REPO}" pr merge --merge "$(cat pr.txt)" ; do sleep 10 ; done
+        run: until gh pr merge --merge --auto-merge ; do sleep 10 ; done
