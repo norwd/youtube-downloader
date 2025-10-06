@@ -62,14 +62,23 @@ jobs:
         run: echo "branch=archive/${REPO}/${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-${{ strategy.job-index }}-$(openssl rand -hex 8)" | tee -a "${GITHUB_OUTPUT}"
 
       - name: Download
+        id: download
         run: |
           yt-dlp "${URL}" \
             --no-simulate \
+            --quiet --verbose \
             --no-abort-on-error \
             --proxy socks5h://localhost:9050 \
             --concurrent-fragments "$(nproc)" \
             --restrict-filenames --windows-filenames \
             --format "${FORMAT}" --format-sort "filesize:100M" \
+            --print-to-file 'id=%(id)s' "${GITHUB_OUTPUT}" \
+            --print-to-file 'title=%(title)s' "${GITHUB_OUTPUT}" \
+            --print-to-file 'license=%(license)s' "${GITHUB_OUTPUT}" \
+            --print-to-file 'filename=%(filename)s' "${GITHUB_OUTPUT}" \
+            --print-to-file 'fulltitle=%(fulltitle)s' "${GITHUB_OUTPUT}" \
+            --print-to-file 'alt_title=%(alt_title)s' "${GITHUB_OUTPUT}" \
+            --print-to-file 'webpage_url=%(webpage_url)s' "${GITHUB_OUTPUT}" \
             --sleep-subtitles 50 --sleep-requests 50 --sleep-interval 50 --max-sleep-interval 60
 
       - name: Status
@@ -99,7 +108,15 @@ jobs:
           commit_user_email: 106889957+norwd@users.noreply.github.com
           commit_options: --signoff
           commit_message: |
-            Archive ${{ env.URL }}
+            Archive ${{ steps.download.outputs.webpage_url }}
+
+            * ID: ${{ steps.download.outputs.id }}
+            * URL: ${{ steps.download.outputs.webpage_url }}
+            * License: ${{ steps.download.outputs.license }}
+            * Filename: ${{ steps.download.outputs.filename }}
+            * Title: ${{ steps.download.outputs.title }}
+            * Title (alt): ${{ steps.download.outputs.alt_title }}
+            * Title (full): ${{ steps.download.outputs.fulltitle }}
 
             **NOTE:** This is an automatic commit. See the archive-video.yaml workflow.
 
@@ -109,8 +126,16 @@ jobs:
         env:
           BASE: ${{ github.ref_name }}
           HEAD: ${{ steps.target.outputs.branch }}
-          TITLE: "Archive ${{ env.URL }}"
+          TITLE: "Archive ${{ steps.download.outputs.webpage_url }}"
           BODY: |
+            * ID: ${{ steps.download.outputs.id }}
+            * URL: ${{ steps.download.outputs.webpage_url }}
+            * License: ${{ steps.download.outputs.license }}
+            * Filename: ${{ steps.download.outputs.filename }}
+            * Title: ${{ steps.download.outputs.title }}
+            * Title (alt): ${{ steps.download.outputs.alt_title }}
+            * Title (full): ${{ steps.download.outputs.fulltitle }}
+
             **NOTE:** This is an automatic commit. See the archive-video.yaml workflow.
 
       - name: Approve Pull Request
