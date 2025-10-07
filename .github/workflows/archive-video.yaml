@@ -89,6 +89,8 @@ jobs:
 
       - name: Push
         run: |
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
           git checkout -b "${HEAD}"
           git add --verbose .
           git commit --signoff --author="$AUTH{}" --message="${MESG}"
@@ -97,7 +99,6 @@ jobs:
         env:
           BASE: ${{ github.ref_name }}
           HEAD: ${{ steps.target.outputs.branch }}
-          AUTH: norwd <106889957+norwd@users.noreply.github.com>
           MESG: Archive ${{ steps.download.outputs.webpage_url }}
           BODY: |
             * ID: ${{ steps.download.outputs.id }}
