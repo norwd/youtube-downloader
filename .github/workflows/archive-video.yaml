@@ -114,4 +114,4 @@ jobs:
       - name: Merge
         continue-on-error: true # Don't worry if it can't merge, the PR can be manually merged later
         timeout-minutes: 1
-        run: until gh pr merge --auto --merge ; do sleep 10 ; done
+        run: until gh pr merge --merge ; do sleep 10 ; done
