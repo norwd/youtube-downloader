@@ -91,13 +91,13 @@ jobs:
         run: |
           git checkout -b "${HEAD}"
           git add --verbose .
-          git commit --signoff --author="${}" --message="${MESSAGE}"
+          git commit --signoff --author="$AUTH{}" --message="${MESG}"
           git push --set-upstream origin "${HEAD}"
           gh pr create --base "${BASE}" --title "${MESG}" --body "${BODY}" | tee -a "${GITHUB_STEP_SUMMARY}"
         env:
           BASE: ${{ github.ref_name }}
           HEAD: ${{ steps.target.outputs.branch }}
-          USER: norwd <106889957+norwd@users.noreply.github.com>
+          AUTH: norwd <106889957+norwd@users.noreply.github.com>
           MESG: Archive ${{ steps.download.outputs.webpage_url }}
           BODY: |
             * ID: ${{ steps.download.outputs.id }}
