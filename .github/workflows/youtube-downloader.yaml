@@ -43,21 +43,15 @@ jobs:
       json: ${{ steps.list-environments.outputs.json }}
 
   archive-playlist:
+    name: "Archive Playlist"
     needs: list-environments
-    environment: ${{ matrix.environment }}
     strategy:
       fail-fast: false
-      max-parallel: 256
+      max-parallel: 2
       matrix:
         environment: ${{ fromJSON(needs.list-environments.outputs.json) }}
 
-    name: "Archive Playlist"
-    runs-on: ubuntu-latest
-    steps:
-
-      - name: "Run Workflow to Archive Playlist"
-        run: gh workflow run "${WORKFLOW}" --ref "${REF}" --raw-field environment="${ENV}"
-        env:
-          WORKFLOW: archive-playlist.yaml
-          REF: ${{ github.ref_name }}
-          ENV: ${{ matrix.environment }}
+    secrets: inherit
+    uses: ./.github/workflows/archive-playlist.yaml
+    with:
+      environment: ${{ matrix.environment }}
