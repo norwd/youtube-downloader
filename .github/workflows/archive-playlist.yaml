@@ -4,13 +4,19 @@ name: "Archive Playlist"
 run-name: "Archive Playlist"
 
 on:
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        required: true
+        description: Environment to archive the playlist in
+
   workflow_dispatch:
     inputs:
       environment:
         type: environment
         required: true
-        description: |
-          Environment to run tests against
+        description: Environment to archive the playlist in
 
 defaults:
   run:
@@ -66,7 +72,7 @@ jobs:
     needs: enumerate-playlist
     strategy:
       fail-fast: false
-      max-parallel: 256
+      max-parallel: 2
       matrix:
         url: ${{ fromJSON(needs.enumerate-playlist.outputs.urls) }}
 
