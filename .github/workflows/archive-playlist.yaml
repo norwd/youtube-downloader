@@ -64,18 +64,13 @@ jobs:
   archive-video:
     name: "Archive Video"
     needs: enumerate-playlist
-    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       max-parallel: 256
       matrix:
         url: ${{ fromJSON(needs.enumerate-playlist.outputs.urls) }}
 
-    steps:
-      - name: "Run Workflow to Archive Video"
-        run: gh workflow run "${WORKFLOW}" --ref "${REF}" --raw-field environment="${ENV}" --raw-field url="${URL}"
-        env:
-          WORKFLOW: archive-video.yaml
-          REF: ${{ github.ref_name }}
-          ENV: ${{ inputs.environment }}
-          URL: ${{ matrix.url }}
+    uses: ./.github/workflows/archive-video.yaml
+    with:
+      environment: ${{ inputs.environment }}
+      url: ${{ matrix.url }}
