@@ -81,60 +81,36 @@ jobs:
             --print-to-file 'webpage_url=%(webpage_url)s' "${GITHUB_OUTPUT}" \
             --sleep-subtitles 50 --sleep-requests 50 --sleep-interval 50 --max-sleep-interval 60
 
-      - name: Status
-        run: git status
-
       - name: Split Files greater than 100 Megabytes
         run: find . -size +100M -not -path './.git/*' | xargs --verbose -IFILE split --bytes 100m --hex-suffixes --additional-suffix .split "FILE" "FILE."
-
-      - name: Status
-        run: git status
 
       - name: Remove Files Over 100 Megabytes
         run: find . -size +100M -not -path './.git/*' | xargs --verbose -IFILE rm -rf FILE
 
-      - name: Status
-        run: git status
-
-      - name: Checkout
-        run: |
-          git checkout -b "${{ steps.target.outputs.branch }}"
-
-      - name: Configure
-        run: |
-          git config user.name "norwd"
-          git config user.email "106889957+norwd@users.noreply.github.com"
-
-      - name: Add
-        run: |
-          git add .
-
-      - name: Commit
-        run: |
-          git commit --signoff --file=- << EOF
-          Archive ${{ steps.download.outputs.webpage_url }}
-
-          * ID: ${{ steps.download.outputs.id }}
-          * URL: ${{ steps.download.outputs.webpage_url }}
-          * License: ${{ steps.download.outputs.license }}
-          * Filename: ${{ steps.download.outputs.filename }}
-          * Title: ${{ steps.download.outputs.title }}
-          * Title (alt): ${{ steps.download.outputs.alt_title }}
-          * Title (full): ${{ steps.download.outputs.fulltitle }}
-
-          **NOTE:** This is an automatic commit. See the archive-video.yaml workflow.
-          EOF
-
       - name: Push
         run: |
-          git push -u origin "${{ steps.target.outputs.branch }}"
-
-      - name: Create Pull Request
-        run: gh pr create --base "${BASE}" --title "Archive ${{ steps.download.outputs.webpage_url }}" --body "$(git show)" | tee -a "${GITHUB_STEP_SUMMARY}"
+          git checkout -b "${HEAD}"
+          git add --verbose .
+          git commit --signoff --author="${}" --message="${MESSAGE}"
+          git push --set-upstream origin "${HEAD}"
+          gh pr create --base "${BASE}" --title "${MESG}" --body "${BODY}" | tee -a "${GITHUB_STEP_SUMMARY}"
         env:
           BASE: ${{ github.ref_name }}
+          HEAD: ${{ steps.target.outputs.branch }}
+          USER: norwd <106889957+norwd@users.noreply.github.com>
+          MESG: Archive ${{ steps.download.outputs.webpage_url }}
+          BODY: |
+            * ID: ${{ steps.download.outputs.id }}
+            * URL: ${{ steps.download.outputs.webpage_url }}
+            * License: ${{ steps.download.outputs.license }}
+            * Filename: ${{ steps.download.outputs.filename }}
+            * Title: ${{ steps.download.outputs.title }}
+            * Title (alt): ${{ steps.download.outputs.alt_title }}
+            * Title (full): ${{ steps.download.outputs.fulltitle }}
 
-      - name: Approve Pull Request
+            **NOTE:** This is an automatic commit. See the archive-video.yaml workflow.
+
+      - name: Merge
         continue-on-error: true # Don't worry if it can't merge, the PR can be manually merged later
         timeout-minutes: 1
-        run: until gh pr merge --merge --auto-merge ; do sleep 10 ; done
+        run: until gh pr merge --auto --merge ; do sleep 10 ; done
