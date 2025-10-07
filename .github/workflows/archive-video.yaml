@@ -96,12 +96,21 @@ jobs:
       - name: Status
         run: git status
 
-      - name: Push
+      - name: Checkout
         run: |
           git checkout -b "${{ steps.target.outputs.branch }}"
+
+      - name: Configure
+        run: |
           git config user.name "norwd"
           git config user.email "106889957+norwd@users.noreply.github.com"
+
+      - name: Add
+        run: |
           git add .
+
+      - name: Commit
+        run: |
           git commit --signoff --file=- << EOF
           Archive ${{ steps.download.outputs.webpage_url }}
 
@@ -115,10 +124,13 @@ jobs:
 
           **NOTE:** This is an automatic commit. See the archive-video.yaml workflow.
           EOF
+
+      - name: Push
+        run: |
           git push -u origin "${{ steps.target.outputs.branch }}"
 
       - name: Create Pull Request
-        run: gh pr create --fill-first --base "${BASE}" | tee -a "${GITHUB_STEP_SUMMARY}" | tee -a pr.txt
+        run: gh pr create --base "${BASE}" --body "$(git show)" | tee -a "${GITHUB_STEP_SUMMARY}"
         env:
           BASE: ${{ github.ref_name }}
 
