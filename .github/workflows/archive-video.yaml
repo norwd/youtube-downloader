@@ -4,6 +4,18 @@ name: "Archive Video"
 run-name: "Archive Video"
 
 on:
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        required: true
+        description: Environment to archive the video in
+
+      url:
+        type: string
+        required: true
+        description: Url of the video to archive
+
   workflow_dispatch:
     inputs:
       environment:
