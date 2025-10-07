@@ -70,6 +70,7 @@ jobs:
       matrix:
         url: ${{ fromJSON(needs.enumerate-playlist.outputs.urls) }}
 
+    secrets: inherit
     uses: ./.github/workflows/archive-video.yaml
     with:
       environment: ${{ inputs.environment }}
