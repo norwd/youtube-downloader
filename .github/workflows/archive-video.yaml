@@ -130,7 +130,7 @@ jobs:
           git push -u origin "${{ steps.target.outputs.branch }}"
 
       - name: Create Pull Request
-        run: gh pr create --base "${BASE}" --body "$(git show)" | tee -a "${GITHUB_STEP_SUMMARY}"
+        run: gh pr create --base "${BASE}" --title "Archive ${{ steps.download.outputs.webpage_url }}" --body "$(git show)" | tee -a "${GITHUB_STEP_SUMMARY}"
         env:
           BASE: ${{ github.ref_name }}
 
