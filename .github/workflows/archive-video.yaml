@@ -93,7 +93,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git checkout -b "${HEAD}"
           git add --verbose .
-          git commit --signoff --author="$AUTH{}" --message="${MESG}"
+          git commit --signoff --message="${MESG}"
           git push --set-upstream origin "${HEAD}"
           gh pr create --base "${BASE}" --title "${MESG}" --body "${BODY}" | tee -a "${GITHUB_STEP_SUMMARY}"
         env:
