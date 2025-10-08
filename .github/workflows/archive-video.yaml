@@ -112,15 +112,13 @@ jobs:
         env:
           BASE: ${{ github.ref_name }}
           HEAD: ${{ steps.target.outputs.branch }}
-          MESG: Archive ${{ steps.download.outputs.webpage_url }}
+          MESG: Archive ${{ steps.download.outputs.title }}
           BODY: |
-            * ID: ${{ steps.download.outputs.id }}
+            * ID: `${{ steps.download.outputs.id }}`
             * URL: ${{ steps.download.outputs.webpage_url }}
+            * Title: ${{ steps.download.outputs.title }}
             * License: ${{ steps.download.outputs.license }}
             * Filename: ${{ steps.download.outputs.filename }}
-            * Title: ${{ steps.download.outputs.title }}
-            * Title (alt): ${{ steps.download.outputs.alt_title }}
-            * Title (full): ${{ steps.download.outputs.fulltitle }}
 
             **NOTE:** This is an automatic commit. See the archive-video.yaml workflow.
 
