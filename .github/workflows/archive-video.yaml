@@ -112,7 +112,7 @@ jobs:
         env:
           BASE: ${{ github.ref_name }}
           HEAD: ${{ steps.target.outputs.branch }}
-          MESG: Archive ${{ steps.download.outputs.title }}
+          MESG: Archive ${{ steps.download.outputs.webpage_url }}
           BODY: |
             * ID: `${{ steps.download.outputs.id }}`
             * URL: ${{ steps.download.outputs.webpage_url }}
