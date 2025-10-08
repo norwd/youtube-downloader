@@ -76,10 +76,11 @@ jobs:
       - name: Download
         id: download
         run: |
-          yt-dlp "${URL}" \
+          yt-dlp \
             --no-simulate \
             --quiet --verbose \
             --no-abort-on-error \
+            --preset-alias sleep \
             --proxy socks5h://localhost:9050 \
             --concurrent-fragments "$(nproc)" \
             --restrict-filenames --windows-filenames \
@@ -89,10 +90,10 @@ jobs:
             --print-to-file 'title=%(title)s' "${GITHUB_OUTPUT}" \
             --print-to-file 'license=%(license)s' "${GITHUB_OUTPUT}" \
             --print-to-file 'filename=%(filename)s' "${GITHUB_OUTPUT}" \
-            --print-to-file 'fulltitle=%(fulltitle)s' "${GITHUB_OUTPUT}" \
-            --print-to-file 'alt_title=%(alt_title)s' "${GITHUB_OUTPUT}" \
             --print-to-file 'webpage_url=%(webpage_url)s' "${GITHUB_OUTPUT}" \
-            --sleep-subtitles 10 --sleep-requests 10 --sleep-interval 10 --max-sleep-interval 30
+            --sponsorblock-mark "all" \
+            --sponsorblock-remove "sponsor,selfpromo,preview,interaction,outro" \
+            "${URL}"
 
       - name: Split Files greater than 100 Megabytes
         run: find . -size +100M -not -path './.git/*' | xargs --verbose -IFILE split --bytes 100m --hex-suffixes --additional-suffix .split "FILE" "FILE."
