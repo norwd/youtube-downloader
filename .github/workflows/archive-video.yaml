@@ -115,6 +115,12 @@ jobs:
             "${URL}"
 
       - if: steps.restore-cache.outputs.cache-hit != 'true'
+        name: Generate Checksum
+        run: sha256sum "${FILENAME}" | tee "${FILENAME}.sha256"
+        env:
+          FILENAME: ${{ steps.download.outputs.filename }}
+
+      - if: steps.restore-cache.outputs.cache-hit != 'true'
         name: Split Files greater than 100 Megabytes
         run: find . -size +100M -not -path './.git/*' | xargs --verbose -IFILE split --bytes 100m --hex-suffixes --additional-suffix .split "FILE" "FILE."
 
