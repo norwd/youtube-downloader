@@ -151,6 +151,7 @@ jobs:
             * Title: ${{ steps.download.outputs.title }}
             * License: ${{ steps.download.outputs.license }}
             * Filename: ${{ steps.download.outputs.filename }}
+            * HASH: `${{ hashFiles(steps.download.outputs.filename) }}`
 
             **NOTE:** This is an automatic commit. See the archive-video.yaml workflow.
 
