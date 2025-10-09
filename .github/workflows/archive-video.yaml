@@ -52,7 +52,16 @@ jobs:
     environment: ${{ inputs.environment }}
     steps:
 
-      - name: Install
+      - id: restore-cache
+        name: Check if already downloaded
+        uses: actions/cache/restore@v4
+        with:
+          key: ${{ vars.repository }}.${{ inputs.url }}
+          path: .
+          lookup-only: true
+
+      - if: steps.restore-cache.outputs.cache-hit != 'true'
+        name: Install
         run: |
           git config --global http.postBuffer 524288000
           mkdir -p ~/.local/bin
@@ -62,19 +71,22 @@ jobs:
           sudo apt install -y tor ffmpeg
           yt-dlp --version
 
-      - name: Checkout
+      - if: steps.restore-cache.outputs.cache-hit != 'true'
+        name: Checkout
         uses: actions/checkout@v3
         with:
           ref: ${{ secrets.ref || 'main' }}
           token: ${{ secrets.AUTO_DOWNLOAD }}
           repository: ${{ env.REPO }}
 
-      - name: Determine Target
+      - if: steps.restore-cache.outputs.cache-hit != 'true'
         id: target
+        name: Determine Target
         run: echo "branch=archive/${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-${{ strategy.job-index }}-$(openssl rand -hex 8)" | tee -a "${GITHUB_OUTPUT}"
 
-      - name: Download
+      - if: steps.restore-cache.outputs.cache-hit != 'true'
         id: download
+        name: Download
         run: |
           yt-dlp \
             --no-simulate \
@@ -96,7 +108,6 @@ jobs:
             --print-to-file 'license=%(license)s' "${GITHUB_OUTPUT}" \
             --print-to-file 'filename=%(filename)s' "${GITHUB_OUTPUT}" \
             --print-to-file 'webpage_url=%(webpage_url)s' "${GITHUB_OUTPUT}" \
-            --print-to-file 'description=%(description)s' "${GITHUB_OUTPUT}" \
             --print-to-file 'availability=%(availability)s' "${GITHUB_OUTPUT}" \
             --print-to-file 'duration=%(duration)s' "${GITHUB_OUTPUT}" --print-to-file 'duration_string=%(duration_string)s' "${GITHUB_OUTPUT}" \
             --print-to-file 'like_count=%(like_count)s' "${GITHUB_OUTPUT}" --print-to-file 'dislike_count=%(dislike_count)s' "${GITHUB_OUTPUT}" \
@@ -104,20 +115,24 @@ jobs:
             --print-to-file 'modified_timestamp=%(modified_timestamp)s' "${GITHUB_OUTPUT}" --print-to-file 'modified_date=%(modified_date)s' "${GITHUB_OUTPUT}" \
             "${URL}"
 
-      - name: Split Files greater than 100 Megabytes
+      - if: steps.restore-cache.outputs.cache-hit != 'true'
+        name: Split Files greater than 100 Megabytes
         run: find . -size +100M -not -path './.git/*' | xargs --verbose -IFILE split --bytes 100m --hex-suffixes --additional-suffix .split "FILE" "FILE."
 
-      - name: Remove Files Over 100 Megabytes
+      - if: steps.restore-cache.outputs.cache-hit != 'true'
+        name: Remove Files Over 100 Megabytes
         run: find . -size +100M -not -path './.git/*' | xargs --verbose -IFILE rm -rf FILE
 
-      - name: Metadata
+      - if: steps.restore-cache.outputs.cache-hit != 'true'
+        name: Metadata
         run: jq "${JQ_QUERY}" <<< "${METADATA}" | tee "${FILENAME}"
         env:
           METADATA: ${{ toJSON(steps.download.outputs) }}
           FILENAME: ${{ steps.download.outputs.id }}/metadata.json
-          JQ_QUERY: '.'
+          JQ_QUERY: .
 
-      - name: Push
+      - if: steps.restore-cache.outputs.cache-hit != 'true'
+        name: Push
         run: |
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
@@ -139,7 +154,16 @@ jobs:
 
             **NOTE:** This is an automatic commit. See the archive-video.yaml workflow.
 
-      - name: Merge
+      - if: steps.restore-cache.outputs.cache-hit != 'true'
+        name: Merge
         continue-on-error: true # Don't worry if it can't merge, the PR can be manually merged later
         timeout-minutes: 1
         run: until gh pr merge --merge ; do sleep 10 ; done
+
+      - if: steps.restore-cache.outputs.cache-hit != 'true'
+        name: Mark as downloaded
+        uses: actions/cache/save@v4
+        with:
+          key: ${{ steps.restore-cache.outputs.cache-primary-key }}
+          path: |
+            **/*.json
