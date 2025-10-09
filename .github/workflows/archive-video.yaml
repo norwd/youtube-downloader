@@ -59,7 +59,7 @@ jobs:
           echo "~/.local/bin" >> "$GITHUB_PATH"
           curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o ~/.local/bin/yt-dlp
           chmod a+rx ~/.local/bin/yt-dlp
-          sudo apt install -y tor
+          sudo apt install -y tor ffprobe ffmpeg
           yt-dlp --version
 
       - name: Checkout
@@ -91,6 +91,7 @@ jobs:
             --print-to-file 'license=%(license)s' "${GITHUB_OUTPUT}" \
             --print-to-file 'filename=%(filename)s' "${GITHUB_OUTPUT}" \
             --print-to-file 'webpage_url=%(webpage_url)s' "${GITHUB_OUTPUT}" \
+            --sponsorblock-mark "all" --sponsorblock-remove "sponsor,selfpromo,preview,interaction,outro" \
             "${URL}"
 
       - name: Split Files greater than 100 Megabytes
