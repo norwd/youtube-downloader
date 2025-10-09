@@ -59,7 +59,7 @@ jobs:
           echo "~/.local/bin" >> "$GITHUB_PATH"
           curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o ~/.local/bin/yt-dlp
           chmod a+rx ~/.local/bin/yt-dlp
-          sudo apt install -y tor ffprobe ffmpeg
+          sudo apt install -y tor ffmpeg
           yt-dlp --version
 
       - name: Checkout
