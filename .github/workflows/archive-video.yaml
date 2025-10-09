@@ -84,14 +84,15 @@ jobs:
             --proxy socks5h://localhost:9050 \
             --concurrent-fragments "$(nproc)" \
             --restrict-filenames --windows-filenames \
+            --video-multistreams --audio-multistreams \
+            --format "${FORMAT}" --format-sort "filesize:100M" --check-formats \
+            --sponsorblock-mark "all" --sponsorblock-remove "sponsor,selfpromo,preview,interaction,outro" \
             --output "%(id)s/%(ext)s/%(title)s.%(ext)s" \
-            --format "${FORMAT}" --format-sort "filesize:100M" \
             --print-to-file 'id=%(id)s' "${GITHUB_OUTPUT}" \
             --print-to-file 'title=%(title)s' "${GITHUB_OUTPUT}" \
             --print-to-file 'license=%(license)s' "${GITHUB_OUTPUT}" \
             --print-to-file 'filename=%(filename)s' "${GITHUB_OUTPUT}" \
             --print-to-file 'webpage_url=%(webpage_url)s' "${GITHUB_OUTPUT}" \
-            --sponsorblock-mark "all" --sponsorblock-remove "sponsor,selfpromo,preview,interaction,outro" \
             "${URL}"
 
       - name: Split Files greater than 100 Megabytes
