@@ -104,7 +104,6 @@ jobs:
             --print-to-file 'ext=%(ext)s' "${GITHUB_OUTPUT}" \
             --print-to-file 'tags=%(tags)s' "${GITHUB_OUTPUT}" \
             --print-to-file 'title=%(title)s' "${GITHUB_OUTPUT}" \
-            --print-to-file 'epoch=%(epoch)s' "${GITHUB_OUTPUT}" \
             --print-to-file 'license=%(license)s' "${GITHUB_OUTPUT}" \
             --print-to-file 'filename=%(filename)s' "${GITHUB_OUTPUT}" \
             --print-to-file 'webpage_url=%(webpage_url)s' "${GITHUB_OUTPUT}" \
@@ -146,12 +145,11 @@ jobs:
           HEAD: ${{ steps.target.outputs.branch }}
           MESG: Archive ${{ steps.download.outputs.webpage_url }}
           BODY: |
-            * ID: `${{ steps.download.outputs.id }}`
-            * URL: ${{ steps.download.outputs.webpage_url }}
-            * Title: ${{ steps.download.outputs.title }}
-            * License: ${{ steps.download.outputs.license }}
-            * Filename: ${{ steps.download.outputs.filename }}
-            * HASH: `${{ hashFiles(steps.download.outputs.filename) }}`
+            * **ID**: `${{ steps.download.outputs.id }}`
+            * **URL**: ${{ steps.download.outputs.webpage_url }}
+            * **Title**: ${{ steps.download.outputs.title }}
+            * **Filename**: ${{ steps.download.outputs.filename }}
+            * **HASH**: `${{ hashFiles(steps.download.outputs.filename) }}`
 
             **NOTE:** This is an automatic commit. See the archive-video.yaml workflow.
 
