@@ -89,10 +89,19 @@ jobs:
             --sponsorblock-mark "all" --sponsorblock-remove "sponsor,selfpromo,preview,interaction,outro" \
             --output "%(id)s/%(ext)s/%(title)s.%(ext)s" \
             --print-to-file 'id=%(id)s' "${GITHUB_OUTPUT}" \
+            --print-to-file 'ext=%(ext)s' "${GITHUB_OUTPUT}" \
+            --print-to-file 'tags=%(tags)s' "${GITHUB_OUTPUT}" \
             --print-to-file 'title=%(title)s' "${GITHUB_OUTPUT}" \
+            --print-to-file 'epoch=%(epoch)s' "${GITHUB_OUTPUT}" \
             --print-to-file 'license=%(license)s' "${GITHUB_OUTPUT}" \
             --print-to-file 'filename=%(filename)s' "${GITHUB_OUTPUT}" \
             --print-to-file 'webpage_url=%(webpage_url)s' "${GITHUB_OUTPUT}" \
+            --print-to-file 'description=%(description)s' "${GITHUB_OUTPUT}" \
+            --print-to-file 'availability=%(availability)s' "${GITHUB_OUTPUT}" \
+            --print-to-file 'duration=%(duration)s' "${GITHUB_OUTPUT}" --print-to-file 'duration_string=%(duration_string)s' "${GITHUB_OUTPUT}" \
+            --print-to-file 'like_count=%(like_count)s' "${GITHUB_OUTPUT}" --print-to-file 'dislike_count=%(dislike_count)s' "${GITHUB_OUTPUT}" \
+            --print-to-file 'release_timestamp=%(release_timestamp)s' "${GITHUB_OUTPUT}" --print-to-file 'release_date=%(release_date)s' "${GITHUB_OUTPUT}" \
+            --print-to-file 'modified_timestamp=%(modified_timestamp)s' "${GITHUB_OUTPUT}" --print-to-file 'modified_date=%(modified_date)s' "${GITHUB_OUTPUT}" \
             "${URL}"
 
       - name: Split Files greater than 100 Megabytes
@@ -100,6 +109,13 @@ jobs:
 
       - name: Remove Files Over 100 Megabytes
         run: find . -size +100M -not -path './.git/*' | xargs --verbose -IFILE rm -rf FILE
+
+      - name: Metadata
+        run: jq "${JQ_QUERY}" <<< "${METADATA}" | tee "${FILENAME}"
+        env:
+          METADATA: ${{ toJSON(steps.download.outputs) }}
+          FILENAME: ${{ steps.download.outputs.id }}/metadata.json
+          JQ_QUERY: '.'
 
       - name: Push
         run: |
