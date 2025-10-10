@@ -52,16 +52,15 @@ jobs:
     environment: ${{ inputs.environment }}
     steps:
 
-      - id: restore-cache
+      - id: cache
         name: Check if already downloaded
-        uses: actions/cache/restore@v4
+        uses: actions/cache@v4
         with:
           key: ${{ vars.repository }}.${{ inputs.url }}
-          lookup-only: true
           path: |
             **/*.json
 
-      - if: steps.restore-cache.outputs.cache-hit != 'true'
+      - if: steps.cache.outputs.cache-hit != 'true'
         name: Install
         run: |
           git config --global http.postBuffer 524288000
@@ -72,7 +71,7 @@ jobs:
           sudo apt install -y tor ffmpeg
           yt-dlp --version
 
-      - if: steps.restore-cache.outputs.cache-hit != 'true'
+      - if: steps.cache.outputs.cache-hit != 'true'
         name: Checkout
         uses: actions/checkout@v3
         with:
@@ -80,12 +79,12 @@ jobs:
           token: ${{ secrets.AUTO_DOWNLOAD }}
           repository: ${{ env.REPO }}
 
-      - if: steps.restore-cache.outputs.cache-hit != 'true'
+      - if: steps.cache.outputs.cache-hit != 'true'
         id: target
         name: Determine Target
         run: echo "branch=archive/${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-${{ strategy.job-index }}-$(openssl rand -hex 8)" | tee -a "${GITHUB_OUTPUT}"
 
-      - if: steps.restore-cache.outputs.cache-hit != 'true'
+      - if: steps.cache.outputs.cache-hit != 'true'
         id: download
         name: Download
         run: |
@@ -115,21 +114,21 @@ jobs:
             --print-to-file 'modified_timestamp=%(modified_timestamp)s' "${GITHUB_OUTPUT}" --print-to-file 'modified_date=%(modified_date)s' "${GITHUB_OUTPUT}" \
             "${URL}"
 
-      - if: steps.restore-cache.outputs.cache-hit != 'true'
+      - if: steps.cache.outputs.cache-hit != 'true'
         name: Generate Checksum
         run: sha256sum "${FILENAME}" | tee "${FILENAME}.sha256"
         env:
           FILENAME: ${{ steps.download.outputs.filename }}
 
-      - if: steps.restore-cache.outputs.cache-hit != 'true'
+      - if: steps.cache.outputs.cache-hit != 'true'
         name: Split Files greater than 100 Megabytes
         run: find . -size +100M -not -path './.git/*' | xargs --verbose -IFILE split --bytes 100m --hex-suffixes --additional-suffix .split "FILE" "FILE."
 
-      - if: steps.restore-cache.outputs.cache-hit != 'true'
+      - if: steps.cache.outputs.cache-hit != 'true'
         name: Remove Files Over 100 Megabytes
         run: find . -size +100M -not -path './.git/*' | xargs --verbose -IFILE rm -rf FILE
 
-      - if: steps.restore-cache.outputs.cache-hit != 'true'
+      - if: steps.cache.outputs.cache-hit != 'true'
         name: Metadata
         run: jq "${JQ_QUERY}" <<< "${METADATA}" | tee "${FILENAME}"
         env:
@@ -137,7 +136,7 @@ jobs:
           FILENAME: ${{ steps.download.outputs.id }}/metadata.json
           JQ_QUERY: .
 
-      - if: steps.restore-cache.outputs.cache-hit != 'true'
+      - if: steps.cache.outputs.cache-hit != 'true'
         name: Push
         run: |
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -160,16 +159,8 @@ jobs:
 
             **NOTE:** This is an automatic commit. See the archive-video.yaml workflow.
 
-      - if: steps.restore-cache.outputs.cache-hit != 'true'
+      - if: steps.cache.outputs.cache-hit != 'true'
         name: Merge
         continue-on-error: true # Don't worry if it can't merge, the PR can be manually merged later
         timeout-minutes: 1
         run: until gh pr merge --merge ; do sleep 10 ; done
-
-      - if: steps.restore-cache.outputs.cache-hit != 'true'
-        name: Mark as downloaded
-        uses: actions/cache/save@v4
-        with:
-          key: ${{ steps.restore-cache.outputs.cache-primary-key }}
-          path: |
-            **/*.json
