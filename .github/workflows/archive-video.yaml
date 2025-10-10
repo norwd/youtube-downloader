@@ -57,8 +57,9 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           key: ${{ vars.repository }}.${{ inputs.url }}
-          path: .
           lookup-only: true
+          path: |
+            **/*.json
 
       - if: steps.restore-cache.outputs.cache-hit != 'true'
         name: Install
