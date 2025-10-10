@@ -109,7 +109,6 @@ jobs:
             --print-to-file 'webpage_url=%(webpage_url)s' "${GITHUB_OUTPUT}" \
             --print-to-file 'availability=%(availability)s' "${GITHUB_OUTPUT}" \
             --print-to-file 'duration=%(duration)s' "${GITHUB_OUTPUT}" --print-to-file 'duration_string=%(duration_string)s' "${GITHUB_OUTPUT}" \
-            --print-to-file 'like_count=%(like_count)s' "${GITHUB_OUTPUT}" --print-to-file 'dislike_count=%(dislike_count)s' "${GITHUB_OUTPUT}" \
             --print-to-file 'release_timestamp=%(release_timestamp)s' "${GITHUB_OUTPUT}" --print-to-file 'release_date=%(release_date)s' "${GITHUB_OUTPUT}" \
             --print-to-file 'modified_timestamp=%(modified_timestamp)s' "${GITHUB_OUTPUT}" --print-to-file 'modified_date=%(modified_date)s' "${GITHUB_OUTPUT}" \
             "${URL}"
