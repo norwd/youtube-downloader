@@ -68,7 +68,7 @@ jobs:
           echo "~/.local/bin" >> "$GITHUB_PATH"
           curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o ~/.local/bin/yt-dlp
           chmod a+rx ~/.local/bin/yt-dlp
-          sudo apt install -y tor ffmpeg
+          sudo apt install -y tor ffmpeg moreutils
           yt-dlp --version
 
       - if: steps.cache.outputs.cache-hit != 'true'
@@ -121,7 +121,7 @@ jobs:
 
       - if: steps.cache.outputs.cache-hit != 'true'
         name: Generate Checksum
-        run: find . -type f -not -path './.*' -print0 | xargs -0 sha256sum | tee -a sha256.txt
+        run: find . -type f -not -path './.*' | xargs sha256sum | sponge sha256.txt
         working-directory: ${{ steps.download.outputs.id }}/${{ steps.download.outputs.ext }}
 
       - if: steps.cache.outputs.cache-hit != 'true'
@@ -145,7 +145,7 @@ jobs:
           git add --verbose .
           git commit --signoff --message="${MESG}"
           git push --set-upstream origin "${HEAD}"
-          gh pr create --base "${BASE}" --title "${MESG}" --body "${BODY}" | tee -a "${GITHUB_STEP_SUMMARY}"
+          gh pr create --base "${BASE}" --title "${MESG}" --body "${BODY}"
         env:
           BASE: ${{ github.ref_name }}
           HEAD: ${{ steps.target.outputs.branch }}
@@ -163,9 +163,9 @@ jobs:
         name: Merge
         continue-on-error: true # Don't worry if it can't merge, the PR can be manually merged later
         timeout-minutes: 1
-        run: gh pr merge --merge || gh pr view --json 'url,number,title,body' --template '{{.number}}{{"\n"}}' | tee -a "${GITHUB_STEP_SUMMARY}"
+        run: gh pr merge --merge || gh pr view --json "${JQ_PROPS}" --template "${TEMPLATE}" | tee -a "${GITHUB_STEP_SUMMARY}"
         env:
-          JQ_PROPS: .
+          JQ_PROPS: 'url,number,title,body'
           TEMPLATE: |
             Could not merge [${{ env.REPO }}#{{ .number }}]({{ .url }}), need manual intervention!
 
