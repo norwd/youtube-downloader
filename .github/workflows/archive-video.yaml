@@ -167,7 +167,7 @@ jobs:
         env:
           JQ_PROPS: 'url,number,title,body'
           TEMPLATE: |
-            # Could not merge [${{ env.REPO }}#{{ .number }}]({{ .url }}), need manual intervention!
+            # Could not merge [${{ env.REPO }}#{{ .number }}]({{ .url }}), needs manual intervention!
 
             Possible fixes:
 
