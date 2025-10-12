@@ -167,12 +167,13 @@ jobs:
         env:
           JQ_PROPS: 'url,number,title,body'
           TEMPLATE: |
-            Could not merge [${{ env.REPO }}#{{ .number }}]({{ .url }}), need manual intervention!
+            # Could not merge [${{ env.REPO }}#{{ .number }}]({{ .url }}), need manual intervention!
 
             Possible fixes:
+
             * https://github.com/${{ env.REPO }}/delete/main/${{ steps.download.outputs.id }}
             * https://github.com/${{ env.REPO }}/delete/main/${{ steps.download.outputs.filename }}
 
-            # {{ .title }}
+            ## {{ .title }}
 
             {{ .body }}
