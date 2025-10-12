@@ -110,19 +110,19 @@ jobs:
             --print-to-file 'webpage_url=%(webpage_url)s' "${GITHUB_OUTPUT}" \
             --print-to-file 'availability=%(availability)s' "${GITHUB_OUTPUT}" \
             --print-to-file 'duration=%(duration)s' "${GITHUB_OUTPUT}" --print-to-file 'duration_string=%(duration_string)s' "${GITHUB_OUTPUT}" \
-            --print-to-file 'release_timestamp=%(release_timestamp)s' "${GITHUB_OUTPUT}" --print-to-file 'release_date=%(release_date)s' "${GITHUB_OUTPUT}" \
             --print-to-file 'modified_timestamp=%(modified_timestamp)s' "${GITHUB_OUTPUT}" --print-to-file 'modified_date=%(modified_date)s' "${GITHUB_OUTPUT}" \
+            --print-to-file 'channel=%(channel)s' "${GITHUB_OUTPUT}" --print-to-file 'channel_id=%(channel_id)s' "${GITHUB_OUTPUT}" --print-to-file 'channel_url=%(channel_url)s' "${GITHUB_OUTPUT}" \
+            --print-to-file 'upload_date=%(upload_date)s' "${GITHUB_OUTPUT}" --print-to-file 'release_timestamp=%(release_timestamp)s' "${GITHUB_OUTPUT}" --print-to-file 'release_date=%(release_date)s' "${GITHUB_OUTPUT}" \
             "${URL}"
-
-      - if: steps.cache.outputs.cache-hit != 'true'
-        name: Generate Checksum
-        run: sha256sum "${FILENAME}" | tee "${FILENAME}.sha256"
-        env:
-          FILENAME: ${{ steps.download.outputs.filename }}
 
       - if: steps.cache.outputs.cache-hit != 'true'
         name: Split Files greater than 100 Megabytes
         run: find . -size +100M -not -path './.git/*' | xargs --verbose -IFILE split --bytes 100m --hex-suffixes --additional-suffix .split "FILE" "FILE."
+
+      - if: steps.cache.outputs.cache-hit != 'true'
+        name: Generate Checksum
+        run: find . -type f -not -path './.*' -print0 | xargs -0 sha256sum | tee -a sha256.txt
+        working-directory: ${{ steps.download.outputs.id }}/${{ steps.download.outputs.ext }}
 
       - if: steps.cache.outputs.cache-hit != 'true'
         name: Remove Files Over 100 Megabytes
