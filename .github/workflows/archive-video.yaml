@@ -130,10 +130,10 @@ jobs:
 
       - if: steps.cache.outputs.cache-hit != 'true'
         name: Metadata
-        run: jq "${JQ_QUERY}" <<< "${METADATA}" | tee "${FILENAME}"
+        run: jq "${JQ_QUERY}" <<< "${METADATA}" | tee metadata.json
+        working-directory: ${{ steps.download.outputs.id }}
         env:
           METADATA: ${{ toJSON(steps.download.outputs) }}
-          FILENAME: ${{ steps.download.outputs.id }}/metadata.json
           JQ_QUERY: .
 
       - if: steps.cache.outputs.cache-hit != 'true'
