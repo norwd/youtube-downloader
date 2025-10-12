@@ -106,6 +106,7 @@ jobs:
             --print-to-file 'title=%(title)s' "${GITHUB_OUTPUT}" \
             --print-to-file 'license=%(license)s' "${GITHUB_OUTPUT}" \
             --print-to-file 'filename=%(filename)s' "${GITHUB_OUTPUT}" \
+            --print-to-file 'filepath=%(filepath)s' "${GITHUB_OUTPUT}" \
             --print-to-file 'webpage_url=%(webpage_url)s' "${GITHUB_OUTPUT}" \
             --print-to-file 'availability=%(availability)s' "${GITHUB_OUTPUT}" \
             --print-to-file 'duration=%(duration)s' "${GITHUB_OUTPUT}" --print-to-file 'duration_string=%(duration_string)s' "${GITHUB_OUTPUT}" \
@@ -115,9 +116,10 @@ jobs:
 
       - if: steps.cache.outputs.cache-hit != 'true'
         name: Generate Checksum
-        run: sha256sum "$(basename "${FILENAME}")" > "${FILENAME}.sha256"
+        run: sha256sum "${FILENAME}" > "${FILENAME}.sha256"
+        working-directory: ${{ steps.download.outputs.id }}/${{ steps.download.outputs.ext }}
         env:
-          FILENAME: ${{ steps.download.outputs.filename }}
+          FILENAME: ${{ steps.download.outputs.title }}.${{ steps.download.outputs.ext }}
 
       - if: steps.cache.outputs.cache-hit != 'true'
         name: Split Files greater than 100 Megabytes
