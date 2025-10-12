@@ -116,10 +116,9 @@ jobs:
 
       - if: steps.cache.outputs.cache-hit != 'true'
         name: Generate Checksum
-        run: sha256sum "${FILENAME}" > "${FILENAME}.sha256"
-        working-directory: ${{ steps.download.outputs.id }}/${{ steps.download.outputs.ext }}
+        run: sha256sum "${FILENAME}" | tee "${FILENAME}.sha256"
         env:
-          FILENAME: ${{ steps.download.outputs.title }}.${{ steps.download.outputs.ext }}
+          FILENAME: ${{ steps.download.outputs.filename }}
 
       - if: steps.cache.outputs.cache-hit != 'true'
         name: Split Files greater than 100 Megabytes
