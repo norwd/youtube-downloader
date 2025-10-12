@@ -121,7 +121,7 @@ jobs:
 
       - if: steps.cache.outputs.cache-hit != 'true'
         name: Generate Checksum
-        run: find . -type f -not -path './.*' | xargs sha256sum | sponge sha256.txt
+        run: find . -type f -not -path './.*' | xargs sha256sum | sponge | tee sha256.txt
         working-directory: ${{ steps.download.outputs.id }}/${{ steps.download.outputs.ext }}
 
       - if: steps.cache.outputs.cache-hit != 'true'
