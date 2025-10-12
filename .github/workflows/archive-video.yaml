@@ -115,7 +115,7 @@ jobs:
 
       - if: steps.cache.outputs.cache-hit != 'true'
         name: Generate Checksum
-        run: sha256sum "${FILENAME}" | tee "${FILENAME}.sha256"
+        run: sha256sum "$(basename "${FILENAME}")" > "${FILENAME}.sha256"
         env:
           FILENAME: ${{ steps.download.outputs.filename }}
 
