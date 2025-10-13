@@ -155,7 +155,6 @@ jobs:
             * **URL**: ${{ steps.download.outputs.webpage_url }}
             * **Title**: ${{ steps.download.outputs.title }}
             * **Filename**: ${{ steps.download.outputs.filename }}
-            * **HASH**: `${{ hashFiles(steps.download.outputs.filename) }}`
 
             **NOTE:** This is an automatic commit. See the archive-video.yaml workflow.
 
@@ -171,6 +170,7 @@ jobs:
 
             Possible fixes:
 
+            * https://github.com/${{ env.REPO }}/pull/{{ .number }}/conflicts
             * https://github.com/${{ env.REPO }}/delete/main/${{ steps.download.outputs.id }}
             * https://github.com/${{ env.REPO }}/delete/main/${{ steps.download.outputs.filename }}
 
