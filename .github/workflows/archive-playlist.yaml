@@ -60,7 +60,7 @@ jobs:
             --ignore-errors \
             --flat-playlist |
           jq --raw-input |
-          sort | comm -23 - <(gh cache list --limit 1000 --json 'key' --jq '.[].key|sub("^[a-zA-Z_.-]+/[a-zA-Z_.-]+\\.";"")' | sort) |
+          sort | comm -23 - <(gh cache list --sort created_at --order desc --limit 1000 --json 'key' --jq '.[].key|sub("^[a-zA-Z_.-]+/[a-zA-Z_.-]+\\.";"")' | jq --raw-input | sort) |
           sort --random-sort |
           jq --slurp --raw-output '"urls=\(.[:256])"' |
           tee -a "${GITHUB_OUTPUT}"
