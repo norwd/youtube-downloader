@@ -34,7 +34,7 @@ jobs:
 
   enumerate-playlist:
     name: Enumerate Playlist
-    runs-on: ubuntu-22.04 # ubuntu-latest
+    runs-on: ubuntu-latest
     timeout-minutes: 1000 # Max time out is lower, but allow for future increase
     environment: ${{ inputs.environment }}
     env:
@@ -48,7 +48,8 @@ jobs:
           echo "~/.local/bin" >> "$GITHUB_PATH"
           curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o ~/.local/bin/yt-dlp
           chmod a+rx ~/.local/bin/yt-dlp
-          sudo apt install --fix-missing -y tor
+          sudo apt-get update --fix-missing
+          sudo apt install -y tor
 
       - id: enumerate
         name: Enumerate
