@@ -56,12 +56,12 @@ jobs:
         run: |
           yt-dlp "${URL}" \
             --proxy socks5h://localhost:9050 \
-            --print webpage_url \
+            --print id \
             --quiet --verbose \
             --ignore-errors \
             --flat-playlist |
           jq --raw-input |
-          sort | comm -23 - <(gh cache list --sort created_at --order desc --limit 2000 --json 'key' --jq '.[].key|sub("^[a-zA-Z_.-]+/[a-zA-Z_.-]+\\.";"")' | jq --raw-input | sort) |
+          sort | comm -23 - <(gh api /repos/${{ vars.repository }}/contents --jq '.[].path')') |
           sort --random-sort |
           jq --slurp --raw-output '"urls=\(.[:256])"' |
           tee -a "${GITHUB_OUTPUT}"
