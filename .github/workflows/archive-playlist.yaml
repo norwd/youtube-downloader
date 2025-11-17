@@ -67,7 +67,7 @@ jobs:
           | jq | tee playlist.json
 
       - name: Get Missing Downloads
-        run: comm -23 <(jq '.entries | sort_by(.id) | [].id' playlist.json) existing-downloads.txt | sort | tee missing-downloads.txt
+        run: comm -23 <(jq --raw-output '.entries[].id' playlist.json | sort) existing-downloads.txt | sort | tee missing-downloads.txt
 
       # - id: enumerate
       #   name: Enumerate
