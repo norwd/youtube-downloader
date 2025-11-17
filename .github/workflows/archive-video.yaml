@@ -52,16 +52,7 @@ jobs:
     environment: ${{ inputs.environment }}
     steps:
 
-      - id: cache
-        name: Check if already downloaded
-        uses: actions/cache@v4
-        with:
-          key: ${{ vars.repository }}.${{ inputs.url }}
-          path: |
-            **/*.json
-
-      - if: steps.cache.outputs.cache-hit != 'true'
-        name: Install
+      - name: Install
         run: |
           git config --global http.postBuffer 524288000
           mkdir -p ~/.local/bin
@@ -72,21 +63,18 @@ jobs:
           sudo apt install -y tor ffmpeg moreutils
           yt-dlp --version
 
-      - if: steps.cache.outputs.cache-hit != 'true'
-        name: Checkout
+      - name: Checkout
         uses: actions/checkout@v3
         with:
           ref: ${{ secrets.ref || 'main' }}
           token: ${{ secrets.AUTO_DOWNLOAD }}
           repository: ${{ env.REPO }}
 
-      - if: steps.cache.outputs.cache-hit != 'true'
-        id: target
+      - id: target
         name: Determine Target
         run: echo "branch=archive/${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-${{ strategy.job-index }}-$(openssl rand -hex 8)" | tee -a "${GITHUB_OUTPUT}"
 
-      - if: steps.cache.outputs.cache-hit != 'true'
-        id: download
+      - id: download
         name: Download
         run: |
           yt-dlp \
@@ -116,29 +104,24 @@ jobs:
             --print-to-file 'upload_date=%(upload_date)s' "${GITHUB_OUTPUT}" --print-to-file 'release_timestamp=%(release_timestamp)s' "${GITHUB_OUTPUT}" --print-to-file 'release_date=%(release_date)s' "${GITHUB_OUTPUT}" \
             "${URL}"
 
-      - if: steps.cache.outputs.cache-hit != 'true'
-        name: Split Files greater than 100 Megabytes
+      - name: Split Files greater than 100 Megabytes
         run: find . -size +100M -not -path './.git/*' | xargs --verbose -IFILE split --bytes 100m --hex-suffixes --additional-suffix .split "FILE" "FILE."
 
-      - if: steps.cache.outputs.cache-hit != 'true'
-        name: Generate Checksum
+      - name: Generate Checksum
         run: find . -type f -not -path './.*' | xargs sha256sum | sponge | tee sha256.txt
         working-directory: ${{ steps.download.outputs.id }}/${{ steps.download.outputs.ext }}
 
-      - if: steps.cache.outputs.cache-hit != 'true'
-        name: Remove Files Over 100 Megabytes
+      - name: Remove Files Over 100 Megabytes
         run: find . -size +100M -not -path './.git/*' | xargs --verbose -IFILE rm -rf FILE
 
-      - if: steps.cache.outputs.cache-hit != 'true'
-        name: Metadata
+      - name: Metadata
         run: jq "${JQ_QUERY}" <<< "${METADATA}" | tee metadata.json
         working-directory: ${{ steps.download.outputs.id }}
         env:
           METADATA: ${{ toJSON(steps.download.outputs) }}
           JQ_QUERY: .
 
-      - if: steps.cache.outputs.cache-hit != 'true'
-        name: Push
+      - name: Push
         run: |
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
@@ -159,8 +142,7 @@ jobs:
 
             **NOTE:** This is an automatic commit. See the archive-video.yaml workflow.
 
-      - if: steps.cache.outputs.cache-hit != 'true'
-        name: Merge
+      - name: Merge
         continue-on-error: true # Don't worry if it can't merge, the PR can be manually merged later
         timeout-minutes: 1
         run: gh pr merge --merge || gh pr view --json "${JQ_PROPS}" --template "${TEMPLATE}" | tee -a "${GITHUB_STEP_SUMMARY}"
