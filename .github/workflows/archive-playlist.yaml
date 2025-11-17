@@ -51,20 +51,37 @@ jobs:
           sudo apt-get update --fix-missing
           sudo apt install -y tor
 
-      - id: enumerate
-        name: Enumerate
+      - name: Get Existing Downloads
+        run: gh api "${ENDPOINT}" --jq "${JQ_QUERY}" | tee existing-downloads.txt
+        env:
+          ENDPOINT: '/repos/${{ vars.repository }}/contents'
+          JQ_QUERY: '.[].path'
+
+      - name: Get Possible Downloads
         run: |
           yt-dlp "${URL}" \
             --proxy socks5h://localhost:9050 \
             --print id \
             --quiet --verbose \
             --ignore-errors \
-            --flat-playlist |
-          jq --raw-input |
-          sort | comm -23 - <(gh api /repos/${{ vars.repository }}/contents --jq '.[].path')') |
-          sort --random-sort |
-          jq --slurp --raw-output '"urls=\(.[:256])"' |
-          tee -a "${GITHUB_OUTPUT}"
+            --flat-playlist \
+          | tee possible-downloads.txt
+
+      - name: Get Missing Downloads
+        run: comm -23 possible-downloads.txt existing-downloads.txt | tee missing-downloads.txt
+
+      - id: enumerate
+        name: Enumerate
+        run: |
+          xargs < missing-downloads.txt -IID yt-dlp ID \
+            --proxy socks5h://localhost:9050 \
+            --print id \
+            --quiet --verbose \
+            --ignore-errors \
+          | jq --raw-input \
+          | sort --random-sort \
+          | jq --slurp --raw-output '"urls=\(.[:256])"' \
+          | tee -a "${GITHUB_OUTPUT}"
 
     outputs:
       urls: ${{ steps.enumerate.outputs.urls }}
