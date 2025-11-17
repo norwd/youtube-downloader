@@ -69,18 +69,20 @@ jobs:
       - name: Get Missing Downloads
         run: comm -23 <(jq --raw-output '.entries[].entries[].id' playlist.json | sort) existing-downloads.txt | sort | tee missing-downloads.txt
 
-      # - id: enumerate
-      #   name: Enumerate
-      #   run: |
-      #     xargs < missing-downloads.txt -IID yt-dlp ID \
-      #       --proxy socks5h://localhost:9050 \
-      #       --print webpage_url \
-      #       --quiet --verbose \
-      #       --ignore-errors \
-      #     | jq --raw-input \
-      #     | sort --random-sort \
-      #     | jq --slurp --raw-output '"urls=\(.[:256])"' \
-      #     | tee -a "${GITHUB_OUTPUT}"
+      - id: enumerate
+        name: Enumerate
+        run: |
+          xargs < missing-downloads.txt -IID jq '.entries[].entries[] | select(.id == ID).webpage_url' playlist.json
+
+        #   xargs < missing-downloads.txt -IID yt-dlp ID \
+        #     --proxy socks5h://localhost:9050 \
+        #     --print webpage_url \
+        #     --quiet --verbose \
+        #     --ignore-errors \
+        #   | jq --raw-input \
+        #   | sort --random-sort \
+        #   | jq --slurp --raw-output '"urls=\(.[:256])"' \
+        #   | tee -a "${GITHUB_OUTPUT}"
 
     outputs:
       urls: '[]' # ${{ steps.enumerate.outputs.urls }}
