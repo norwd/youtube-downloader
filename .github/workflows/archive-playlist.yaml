@@ -75,7 +75,6 @@ jobs:
           {
             xargs < missing-downloads.txt -IID jq '.entries[] | select(.id == "ID").url' playlist.json ;
           } |
-          jq --raw-input |
           sort --random-sort |
           jq --slurp --raw-output '"urls=\(.[:256])"' |
           tee -a "${GITHUB_OUTPUT}"
