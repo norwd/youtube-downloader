@@ -66,8 +66,8 @@ jobs:
             --flat-playlist \
           | jq | tee playlist.json
 
-      # - name: Get Missing Downloads
-      #   run: comm -23 possible-downloads.txt existing-downloads.txt | sort | tee missing-downloads.txt
+      - name: Get Missing Downloads
+        run: comm -23 <(jq '.[].id | sort' playlist.json) existing-downloads.txt | sort | tee missing-downloads.txt
 
       # - id: enumerate
       #   name: Enumerate
