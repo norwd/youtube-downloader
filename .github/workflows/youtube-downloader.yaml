@@ -5,13 +5,13 @@ run-name: "Run youtube downloader"
 
 on:
   workflow_dispatch:
-  schedule: [ cron: '18 16 * * 1/3' ]
-  push:
-    branches: [main]
-    paths:
-      - .github/workflows/archive-video.yaml
-      - .github/workflows/archive-playlist.yaml
-      - .github/workflows/youtube-downloader.yaml
+  # schedule: [ cron: '18 16 * * 1/3' ]
+  # push:
+  #   branches: [main]
+  #   paths:
+  #     - .github/workflows/archive-video.yaml
+  #     - .github/workflows/archive-playlist.yaml
+  #     - .github/workflows/youtube-downloader.yaml
 
 defaults:
   run:
