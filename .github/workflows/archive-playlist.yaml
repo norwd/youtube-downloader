@@ -52,7 +52,7 @@ jobs:
           sudo apt install -y tor
 
       - name: Get Existing Downloads
-        run: gh api "${ENDPOINT}" --jq "${JQ_QUERY}" | tee existing-downloads.txt
+        run: gh api "${ENDPOINT}" --jq "${JQ_QUERY}" | sort | tee existing-downloads.txt
         env:
           ENDPOINT: '/repos/${{ vars.repository }}/contents'
           JQ_QUERY: '.[].path'
@@ -65,10 +65,10 @@ jobs:
             --quiet --verbose \
             --ignore-errors \
             --flat-playlist \
-          | tee possible-downloads.txt
+          | sort | tee possible-downloads.txt
 
       - name: Get Missing Downloads
-        run: comm -23 possible-downloads.txt existing-downloads.txt | tee missing-downloads.txt
+        run: comm -23 possible-downloads.txt existing-downloads.txt | sort | tee missing-downloads.txt
 
       - id: enumerate
         name: Enumerate
