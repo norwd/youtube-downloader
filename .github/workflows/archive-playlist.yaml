@@ -72,7 +72,7 @@ jobs:
       - id: enumerate
         name: Enumerate
         run: |
-          xargs < missing-downloads.txt -IID jq '.entries[].entries[] | select(.id == "ID").webpage_url' playlist.json
+          xargs < missing-downloads.txt -IID jq '.entries[].entries[] | select(.id == "ID")' playlist.json
 
         #   xargs < missing-downloads.txt -IID yt-dlp ID \
         #     --proxy socks5h://localhost:9050 \
