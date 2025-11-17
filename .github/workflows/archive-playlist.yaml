@@ -52,7 +52,7 @@ jobs:
           sudo apt install -y tor
 
       - name: Get Existing Downloads
-        run: gh api "${ENDPOINT}" --jq "${JQ_QUERY}" | sort | tee existing-downloads.txt
+        run: gh api "${ENDPOINT}" --paginate --jq "${JQ_QUERY}" | sort | tee existing-downloads.txt
         env:
           ENDPOINT: '/repos/${{ vars.repository }}/contents'
           JQ_QUERY: '.[].path'
@@ -61,30 +61,29 @@ jobs:
         run: |
           yt-dlp "${URL}" \
             --proxy socks5h://localhost:9050 \
-            --print id \
-            --quiet --verbose \
+            --dump-single-json \
             --ignore-errors \
             --flat-playlist \
-          | sort | tee possible-downloads.txt
+          | jq | tee playlist.json
 
-      - name: Get Missing Downloads
-        run: comm -23 possible-downloads.txt existing-downloads.txt | sort | tee missing-downloads.txt
+      # - name: Get Missing Downloads
+      #   run: comm -23 possible-downloads.txt existing-downloads.txt | sort | tee missing-downloads.txt
 
-      - id: enumerate
-        name: Enumerate
-        run: |
-          xargs < missing-downloads.txt -IID yt-dlp ID \
-            --proxy socks5h://localhost:9050 \
-            --print id \
-            --quiet --verbose \
-            --ignore-errors \
-          | jq --raw-input \
-          | sort --random-sort \
-          | jq --slurp --raw-output '"urls=\(.[:256])"' \
-          | tee -a "${GITHUB_OUTPUT}"
+      # - id: enumerate
+      #   name: Enumerate
+      #   run: |
+      #     xargs < missing-downloads.txt -IID yt-dlp ID \
+      #       --proxy socks5h://localhost:9050 \
+      #       --print webpage_url \
+      #       --quiet --verbose \
+      #       --ignore-errors \
+      #     | jq --raw-input \
+      #     | sort --random-sort \
+      #     | jq --slurp --raw-output '"urls=\(.[:256])"' \
+      #     | tee -a "${GITHUB_OUTPUT}"
 
     outputs:
-      urls: ${{ steps.enumerate.outputs.urls }}
+      urls: '[]' # ${{ steps.enumerate.outputs.urls }}
 
   archive-video:
     name: "Archive Video"
