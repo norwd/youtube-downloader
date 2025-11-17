@@ -72,20 +72,16 @@ jobs:
       - id: enumerate
         name: Enumerate
         run: |
-          xargs < missing-downloads.txt -IID jq '.entries[] | select(.id == "ID")' playlist.json
-
-        #   xargs < missing-downloads.txt -IID yt-dlp ID \
-        #     --proxy socks5h://localhost:9050 \
-        #     --print webpage_url \
-        #     --quiet --verbose \
-        #     --ignore-errors \
-        #   | jq --raw-input \
-        #   | sort --random-sort \
-        #   | jq --slurp --raw-output '"urls=\(.[:256])"' \
-        #   | tee -a "${GITHUB_OUTPUT}"
+          {
+            xargs < missing-downloads.txt -IID jq '.entries[] | select(.id == "ID").url' playlist.json ;
+          } |
+          jq --raw-input |
+          sort --random-sort |
+          jq --slurp --raw-output '"urls=\(.[:256])"' |
+          tee -a "${GITHUB_OUTPUT}"
 
     outputs:
-      urls: '[]' # ${{ steps.enumerate.outputs.urls }}
+      urls: ${{ steps.enumerate.outputs.urls }}
 
   archive-video:
     name: "Archive Video"
