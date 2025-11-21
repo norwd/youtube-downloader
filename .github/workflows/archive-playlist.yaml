@@ -85,7 +85,7 @@ jobs:
       urls: ${{ steps.enumerate.outputs.urls }}
 
   archive-video:
-    if: contains(join(fromJSON(needs.enumerate-playlist.outputs.urls)), ',')
+    if: needs.enumerate-playlist.outputs.urls != '[]'
     name: "Archive Video"
     needs: enumerate-playlist
     strategy:
