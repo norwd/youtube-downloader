@@ -4,8 +4,19 @@ name: "Run youtube downloader"
 run-name: "Run youtube downloader"
 
 on:
+
   workflow_dispatch:
-  schedule: [ cron: '18 16 * * 1/3' ]
+
+  schedule:
+    - cron: '18 16 * * 1/3'
+    - cron: '15 14 1 * *'
+    - cron: '23 18-23/2 * * *'
+    - cron: '5 4 * * sun'
+    - cron: '0 4 8-14 * *'
+    - cron: '0 0 1,15 * 3'
+    - cron: '5 0 * 8 *'
+    - cron: '0 22 * * 1-5'
+
   push:
     branches: [main]
     paths:
