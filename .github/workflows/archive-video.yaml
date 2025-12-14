@@ -93,6 +93,7 @@ jobs:
             --quiet --verbose \
             --no-abort-on-error \
             --preset-alias sleep \
+            --js-runtimes "deno:${HOME}/.deno/bin/deno" \
             --proxy socks5h://localhost:9050 \
             --concurrent-fragments "$(nproc)" \
             --restrict-filenames --windows-filenames \
