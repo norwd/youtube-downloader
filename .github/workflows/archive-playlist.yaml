@@ -73,7 +73,7 @@ jobs:
       - name: Get Missing Downloads
         run: comm -23 <(jq --raw-output "${JQ_QUERY}" playlist.json | sort) existing-downloads.txt | tee missing-downloads.txt
         env:
-          JQ_QUERY: '.entries[].id'
+          JQ_QUERY: '.entries[] | select ( .title != "[Private video]" ) | .id'
 
       - id: enumerate
         name: Enumerate
