@@ -116,6 +116,14 @@ jobs:
             --print-to-file 'upload_date=%(upload_date)s' "${GITHUB_OUTPUT}" --print-to-file 'release_timestamp=%(release_timestamp)s' "${GITHUB_OUTPUT}" --print-to-file 'release_date=%(release_date)s' "${GITHUB_OUTPUT}" \
             "${URL}"
 
+      - if: failure()
+        name: Retry
+        run: echo "${INPUTS}" | gh --repo "${REPO}" workflow run "${WORKFLOW}" --json
+        env:
+          WORKFLOW: ${{ github.workflow }}
+          INPUTS: ${{ toJson(inputs) }}
+          REPO: ${{ github.repository }}
+
       - name: Split Files greater than 100 Megabytes
         run: find . -size +100M -not -path './.git/*' | xargs --verbose -IFILE split --bytes 100m --hex-suffixes --additional-suffix .split "FILE" "FILE."
 
