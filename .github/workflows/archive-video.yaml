@@ -120,7 +120,7 @@ jobs:
         name: Retry
         run: echo "${INPUTS}" | gh --repo "${REPO}" workflow run "${WORKFLOW}" --json
         env:
-          WORKFLOW: ${{ github.workflow }}
+          WORKFLOW: archive-video.yaml # ${{ github.workflow }}
           INPUTS: ${{ toJson(inputs) }}
           REPO: ${{ github.repository }}
 
