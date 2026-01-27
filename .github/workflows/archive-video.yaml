@@ -116,7 +116,7 @@ jobs:
             --print-to-file 'upload_date=%(upload_date)s' "${GITHUB_OUTPUT}" --print-to-file 'release_timestamp=%(release_timestamp)s' "${GITHUB_OUTPUT}" --print-to-file 'release_date=%(release_date)s' "${GITHUB_OUTPUT}" \
             "${URL}"
 
-      - if: failure()
+      - if: failure() && false
         name: Retry
         run: echo "${INPUTS}" | gh --repo "${REPO}" workflow run "${WORKFLOW}" --json
         env:
