@@ -28,6 +28,12 @@ on:
         required: true
         description: Url of the video to archive
 
+      retry_count:
+        type: number
+        default: 3
+        required: false
+        description: How many retries could be attempted
+
 env:
   GH_TOKEN: ${{ secrets.AUTO_DOWNLOAD }}
 
@@ -116,13 +122,14 @@ jobs:
             --print-to-file 'upload_date=%(upload_date)s' "${GITHUB_OUTPUT}" --print-to-file 'release_timestamp=%(release_timestamp)s' "${GITHUB_OUTPUT}" --print-to-file 'release_date=%(release_date)s' "${GITHUB_OUTPUT}" \
             "${URL}"
 
-      - if: failure() && false
+      - if: failure() && inputs.retry_count > 0
         name: Retry
-        run: echo "${INPUTS}" | gh --repo "${REPO}" workflow run "${WORKFLOW}" --json
+        run: echo "${INPUTS}" | gh --repo "${REPO}" workflow run "${WORKFLOW}" --json --field retry_count="$((RETRIES-1))"
         env:
           WORKFLOW: archive-video.yaml # ${{ github.workflow }}
           INPUTS: ${{ toJson(inputs) }}
           REPO: ${{ github.repository }}
+          RETRIES: ${{ inputs.retry_count }}
 
       - name: Split Files greater than 100 Megabytes
         run: find . -size +100M -not -path './.git/*' | xargs --verbose -IFILE split --bytes 100m --hex-suffixes --additional-suffix .split "FILE" "FILE."
