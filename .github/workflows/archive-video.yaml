@@ -130,7 +130,7 @@ jobs:
 
       - if: failure() && inputs.retry_count > 0
         name: Retry
-        run: echo "${INPUTS}" | jq '.retry_count = .retry_count - 1' | gh --repo "${REPO}" workflow run "${WORKFLOW}" --json
+        run: echo "${INPUTS}" | gh --repo "${REPO}" workflow run "${WORKFLOW}" --json
         env:
           WORKFLOW: archive-video.yaml # ${{ github.workflow }}
           INPUTS: ${{ toJson(inputs) }}
