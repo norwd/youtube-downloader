@@ -130,11 +130,12 @@ jobs:
 
       - if: failure() && inputs.retry_count > 0
         name: Retry
-        run: echo "${INPUTS}" | jq '.retry_count = (.retry_count - 1 | tostring)' | gh --repo "${REPO}" workflow run "${WORKFLOW}" --json
+        run: echo "${INPUTS}" | jq "${JQ_QUERY}" | gh --repo "${REPO}" workflow run "${WORKFLOW}" --json
         env:
           WORKFLOW: archive-video.yaml # ${{ github.workflow }}
           INPUTS: ${{ toJson(inputs) }}
           REPO: ${{ github.repository }}
+          JQ_QUERY: '.retry_count = ((.retry_count | tostring | tonumber) - 1 | tostring)'
 
       - name: Split Files greater than 100 Megabytes
         run: find . -size +100M -not -path './.git/*' | xargs --verbose -IFILE split --bytes 100m --hex-suffixes --additional-suffix .split "FILE" "FILE."
