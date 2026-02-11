@@ -16,6 +16,12 @@ on:
         required: true
         description: Url of the video to archive
 
+      retry_count:
+        type: number
+        default: 3
+        required: false
+        description: How many retries could be attempted
+
   workflow_dispatch:
     inputs:
       environment:
