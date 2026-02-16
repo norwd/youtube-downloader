@@ -67,7 +67,6 @@ jobs:
             --proxy socks5h://localhost:9050 \
             --dump-single-json \
             --ignore-errors \
-            --flat-playlist \
           | jq | tee playlist.json
 
       - name: Get Missing Downloads
