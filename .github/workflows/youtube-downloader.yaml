@@ -58,7 +58,7 @@ jobs:
     needs: list-environments
     strategy:
       fail-fast: false
-      max-parallel: 32
+      max-parallel: 2
       matrix:
         environment: ${{ fromJSON(needs.list-environments.outputs.json) }}
 
