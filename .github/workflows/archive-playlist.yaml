@@ -67,6 +67,7 @@ jobs:
             --proxy socks5h://localhost:9050 \
             --dump-single-json \
             --ignore-errors \
+            --flat-playlist \
           | jq | tee playlist.json
 
       - name: Get Missing Downloads
@@ -78,7 +79,7 @@ jobs:
         name: Enumerate
         run: |
           {
-            xargs < missing-downloads.txt -IID jq '.entries[] | select(.id == "ID").url' playlist.json ;
+            xargs < missing-downloads.txt -IID jq '(.entries + .entries[].entries)[] | select(.id == "ID" and ._type == "url").url' playlist.json ;
           } |
           sort --random-sort |
           jq --slurp --raw-output '"urls=\(.[:256])"' |
