@@ -79,7 +79,7 @@ jobs:
         name: Enumerate
         run: |
           {
-            xargs < missing-downloads.txt -IID jq '.entries[].entries[] | select(.id == "ID" and ._type == "url" and .url != null).url' playlist.json ;
+            xargs < missing-downloads.txt -IID jq '.entries[] (.entries[] | select(.id == "ID" and ._type == "url" and .url != null).url)' playlist.json ;
           } |
           sort --random-sort |
           jq --slurp --raw-output '"urls=\(.[:256])"' |
