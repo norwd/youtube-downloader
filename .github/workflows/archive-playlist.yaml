@@ -26,10 +26,6 @@ env:
   GH_REPO: ${{ github.repository }}
   GH_TOKEN: ${{ secrets.AUTO_DOWNLOAD }}
 
-concurrency:
-  group: ${{ github.workflow_ref }}-${{ inputs.environment }}
-  cancel-in-progress: false
-
 jobs:
 
   enumerate-playlist:
@@ -106,10 +102,6 @@ jobs:
       max-parallel: 64
       matrix:
         url: ${{ fromJSON(needs.enumerate-playlist.outputs.urls) }}
-
-    concurrency:
-      group: ${{ matrix.url }}
-      cancel-in-progress: false
 
     secrets: inherit
     uses: ./.github/workflows/archive-video.yaml
