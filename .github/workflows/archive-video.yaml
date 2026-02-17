@@ -59,7 +59,7 @@ jobs:
           "bestaudio",
         ]'), ' / ') }}
 
-    name: "Run youtube-dl"
+    name: "Archive ${{ inputs.url }}"
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     steps:
