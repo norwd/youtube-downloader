@@ -99,11 +99,11 @@ jobs:
 
   archive-video:
     if: needs.enumerate-playlist.outputs.urls != '[]'
-    name: "Archive Video"
+    name: "Archive ${{ matrix.url }}"
     needs: enumerate-playlist
     strategy:
       fail-fast: false
-      max-parallel: 32
+      max-parallel: 64
       matrix:
         url: ${{ fromJSON(needs.enumerate-playlist.outputs.urls) }}
 
