@@ -1,7 +1,7 @@
 ---
 
 name: "Archive Video"
-run-name: "Archive Video"
+run-name: "Archive ${{ inputs.url }} (${{ inputs.retry_count }} retries remaining)"
 
 on:
   workflow_call:
