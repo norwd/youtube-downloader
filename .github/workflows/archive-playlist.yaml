@@ -107,6 +107,10 @@ jobs:
       matrix:
         url: ${{ fromJSON(needs.enumerate-playlist.outputs.urls) }}
 
+    concurrency:
+      group: ${{ matrix.url }}
+      cancel-in-progress: false
+
     secrets: inherit
     uses: ./.github/workflows/archive-video.yaml
     with:
