@@ -60,7 +60,7 @@ jobs:
         ]'), ' / ') }}
 
     name: "Archive ${{ inputs.url }}"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     environment: ${{ inputs.environment }}
     steps:
 
