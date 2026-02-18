@@ -40,7 +40,7 @@ jobs:
 
   list-environments:
     name: "List Environments"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
 
       - id: list-environments
