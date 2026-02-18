@@ -99,7 +99,7 @@ jobs:
     needs: enumerate-playlist
     strategy:
       fail-fast: false
-      max-parallel: 4
+      max-parallel: 128
       matrix:
         url: ${{ fromJSON(needs.enumerate-playlist.outputs.urls) }}
 
