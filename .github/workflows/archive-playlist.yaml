@@ -30,7 +30,7 @@ jobs:
 
   enumerate-playlist:
     name: Enumerate Playlist
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-latest
     timeout-minutes: 1000 # Max time out is lower, but allow for future increase
     environment: ${{ inputs.environment }}
     env:
