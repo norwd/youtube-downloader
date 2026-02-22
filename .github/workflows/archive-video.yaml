@@ -64,6 +64,9 @@ jobs:
     environment: ${{ inputs.environment }}
     steps:
 
+      - name: DEBUG
+        run: gh --version
+
       - name: Prepare
         run: sudo apt-get update --fix-missing
 
