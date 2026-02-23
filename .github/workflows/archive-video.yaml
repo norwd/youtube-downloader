@@ -66,15 +66,15 @@ jobs:
 
       - id: gh-version
         name: Get GHCLI Version
-        run: gh --version | jq --raw-input --raw-output "${JQ_QUERY}" # | tee -a "${GITHUB_OUTPUT}"
+        run: gh --version | jq --raw-input --raw-output "${JQ_QUERY}" | tee -a "${GITHUB_OUTPUT}"
         env:
           JQ_QUERY: |
-            #[
-              .capture("v(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)")
-            #][-1]
-            #| to_entries[]
-            #| select(.value != "")
-            #| .key + "=" + (.value | tostring)
+            [
+              . | capture("v(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)")
+            ][-1]
+            | to_entries[]
+            | select(.value != "")
+            | .key + "=" + (.value | tostring)
 
       - if: steps.gh-version.outputs.major == 2 && steps.gh-version.outputs.minor < 87
         name: Upgrade GHCLI
