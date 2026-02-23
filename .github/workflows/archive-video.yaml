@@ -36,7 +36,7 @@ on:
 
       retry_count:
         type: number
-        default: 3
+        default: 5
         required: false
         description: How many retries could be attempted
 
@@ -156,7 +156,7 @@ jobs:
       - id: retry
         if: failure() && steps.download.outcome == 'failure' && inputs.retry_count > 0
         name: Retry
-        run: echo "${INPUTS}" | jq "${JQ_QUERY}" | gh --repo "${REPO}" workflow run "${WORKFLOW}" --json | grep -Poh '/actions/runs/\d+' | xargs -verbose -IRUN_ID gh run watch --compact --exit-status RUN_ID
+        run: echo "${INPUTS}" | jq "${JQ_QUERY}" | gh --repo "${REPO}" workflow run "${WORKFLOW}" --json | grep -Poh '/actions/runs/\d+' | xargs --verbose -IRUN_ID gh run watch --compact --exit-status RUN_ID
         env:
           WORKFLOW: archive-video.yaml # ${{ github.workflow }}
           INPUTS: ${{ toJson(inputs) }}
