@@ -65,7 +65,7 @@ jobs:
     steps:
 
       - name: Check GH CLI Version
-        run: gh --version | grep -EoP 'v\d+\.\K\d+\.\d+'
+        run: gh --version | grep -EoP 'v\d+\.\d+\.\d+'
 
       - name: DEBUG
         run: |
