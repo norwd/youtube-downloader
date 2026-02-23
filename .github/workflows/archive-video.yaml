@@ -70,7 +70,7 @@ jobs:
         env:
           JQ_QUERY: |
             #[
-              .[]
+              . # []
               | capture("v(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)")
             #][-1]
             #| to_entries[]
