@@ -64,10 +64,12 @@ jobs:
     environment: ${{ inputs.environment }}
     steps:
 
-      - name: Check GH CLI Version
-        run: gh --version | grep -oP 'v\d+\.\K(\d+)(?=\.\d+)'
+      - id: gh-version
+        name: Get GHCLI Version
+        run: gh --version | grep -Poh 'v\K\d+\.\d+\.\d+' # | jq '. | split(".") | "major=\(.[0])\nminor=\(.[1])\npatch=\(.[2])"'
 
-      - name: DEBUG
+      - if: steps.gh-version.outputs.major == 2 && steps.gh-version.outputs.minor < 87
+        name: Upgrade GHCLI
         run: |
           (type -p wget >/dev/null || (sudo apt update && sudo apt install wget -y)) \
           	&& sudo mkdir -p -m 755 /etc/apt/keyrings \
