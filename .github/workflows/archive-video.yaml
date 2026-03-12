@@ -18,7 +18,7 @@ on:
 
       retry_count:
         type: number
-        default: 15
+        default: 5
         required: false
         description: How many retries could be attempted
 
@@ -36,7 +36,7 @@ on:
 
       retry_count:
         type: number
-        default: 15
+        default: 5
         required: false
         description: How many retries could be attempted
 
@@ -88,7 +88,7 @@ jobs:
         run: curl -fsSL https://deno.land/install.sh | sh
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
           ref: ${{ secrets.ref || 'main' }}
           token: ${{ secrets.AUTO_DOWNLOAD }}
