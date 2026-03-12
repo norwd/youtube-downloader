@@ -18,7 +18,7 @@ on:
 
       retry_count:
         type: number
-        default: 5
+        default: 15
         required: false
         description: How many retries could be attempted
 
@@ -36,7 +36,7 @@ on:
 
       retry_count:
         type: number
-        default: 5
+        default: 15
         required: false
         description: How many retries could be attempted
 
@@ -93,6 +93,10 @@ jobs:
           ref: ${{ secrets.ref || 'main' }}
           token: ${{ secrets.AUTO_DOWNLOAD }}
           repository: ${{ env.REPO }}
+
+      - id: restart
+        name: Restart
+        run: sudo service tor restart && sleep 15
 
       - id: target
         name: Determine Target
