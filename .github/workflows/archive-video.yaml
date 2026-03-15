@@ -140,7 +140,10 @@ jobs:
             --print-to-file 'upload_date=%(upload_date)s' "${GITHUB_OUTPUT}" --print-to-file 'release_timestamp=%(release_timestamp)s' "${GITHUB_OUTPUT}" --print-to-file 'release_date=%(release_date)s' "${GITHUB_OUTPUT}" \
             "${URL}"
             do
-              sudo service tor restart && sleep 130
+              echo > "${GITHUB_OUTPUT}"
+              sudo service tor restart
+              sleep 130
+              curl --silent --proxy socks5h://localhost:9050 https://check.torproject.org/api/ip
             done
 
       - id: retry
