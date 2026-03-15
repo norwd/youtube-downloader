@@ -119,25 +119,6 @@ jobs:
             --format "${FORMAT}" --format-sort "filesize:100M" --check-formats \
             --sponsorblock-mark "all" --sponsorblock-remove "sponsor,selfpromo,preview,interaction,outro" \
             --output "%(id)s/%(ext)s/%(title)s.%(ext)s" \
-            # --print-to-file 'id=%(id)s' "${GITHUB_OUTPUT}" \
-            # --print-to-file 'display_id=%(display_id)s' "${GITHUB_OUTPUT}" \
-            # --print-to-file 'ext=%(ext)s' "${GITHUB_OUTPUT}" \
-            # --print-to-file 'tags=%(tags)s' "${GITHUB_OUTPUT}" \
-            # --print-to-file 'title=%(title)s' "${GITHUB_OUTPUT}" \
-            # --print-to-file 'fulltitle=%(fulltitle)s' "${GITHUB_OUTPUT}" \
-            # --print-to-file 'alt_title=%(alt_title)s' "${GITHUB_OUTPUT}" \
-            # --print-to-file 'description=%(description)s' "${GITHUB_OUTPUT}" \
-            # --print-to-file 'license=%(license)s' "${GITHUB_OUTPUT}" \
-            # --print-to-file 'filename=%(filename)s' "${GITHUB_OUTPUT}" \
-            # --print-to-file 'filepath=%(filepath)s' "${GITHUB_OUTPUT}" \
-            # --print-to-file 'webpage_url=%(webpage_url)s' "${GITHUB_OUTPUT}" \
-            # --print-to-file 'availability=%(availability)s' "${GITHUB_OUTPUT}" \
-            # --print-to-file 'epoch=%(epoch)s' "${GITHUB_OUTPUT}" \
-            # --print-to-file 'timestamp=%(timestamp)s' "${GITHUB_OUTPUT}" \
-            # --print-to-file 'duration=%(duration)s' "${GITHUB_OUTPUT}" --print-to-file 'duration_string=%(duration_string)s' "${GITHUB_OUTPUT}" \
-            # --print-to-file 'modified_timestamp=%(modified_timestamp)s' "${GITHUB_OUTPUT}" --print-to-file 'modified_date=%(modified_date)s' "${GITHUB_OUTPUT}" \
-            # --print-to-file 'channel=%(channel)s' "${GITHUB_OUTPUT}" --print-to-file 'channel_id=%(channel_id)s' "${GITHUB_OUTPUT}" --print-to-file 'channel_url=%(channel_url)s' "${GITHUB_OUTPUT}" \
-            # --print-to-file 'upload_date=%(upload_date)s' "${GITHUB_OUTPUT}" --print-to-file 'release_timestamp=%(release_timestamp)s' "${GITHUB_OUTPUT}" --print-to-file 'release_date=%(release_date)s' "${GITHUB_OUTPUT}" \
             "${URL}"
             do
               sudo service tor restart
