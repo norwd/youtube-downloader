@@ -105,6 +105,7 @@ jobs:
       - id: download
         name: Download
         run: |
+          until
           yt-dlp \
             --no-simulate \
             --quiet --verbose \
@@ -138,6 +139,7 @@ jobs:
             --print-to-file 'channel=%(channel)s' "${GITHUB_OUTPUT}" --print-to-file 'channel_id=%(channel_id)s' "${GITHUB_OUTPUT}" --print-to-file 'channel_url=%(channel_url)s' "${GITHUB_OUTPUT}" \
             --print-to-file 'upload_date=%(upload_date)s' "${GITHUB_OUTPUT}" --print-to-file 'release_timestamp=%(release_timestamp)s' "${GITHUB_OUTPUT}" --print-to-file 'release_date=%(release_date)s' "${GITHUB_OUTPUT}" \
             "${URL}"
+          ; do sudo service tor restart && sleep 130 ; done
 
       - id: retry
         if: failure() && steps.download.outcome == 'failure' && inputs.retry_count > 0
