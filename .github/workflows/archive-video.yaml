@@ -139,6 +139,9 @@ jobs:
       - name: Split Files greater than 100 Megabytes
         run: find . -size +100M -not -path './.git/*' | xargs --verbose -IFILE split --bytes 100m --hex-suffixes --additional-suffix .split "FILE" "FILE."
 
+      - name: DEBUG
+        run: ls -l
+
       - name: Generate Checksum
         run: find . -type f -not -path './.*' | xargs sha256sum | sponge | tee sha256.txt
         working-directory: ${{ steps.download.outputs.id }}/${{ steps.download.outputs.ext }}
