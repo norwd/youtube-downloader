@@ -122,7 +122,7 @@ jobs:
             --output "%(id)s/%(ext)s/%(title)s.%(ext)s" \
             "${URL}"
             do
-              sudo service tor restart
+              (sudo service tor restart)
               sleep 130
             done
 
@@ -140,7 +140,7 @@ jobs:
         run: find . -size +100M -not -path './.git/*' | xargs --verbose -IFILE split --bytes 100m --hex-suffixes --additional-suffix .split "FILE" "FILE."
 
       - name: DEBUG
-        run: ls -l
+        run: ls -lR
 
       - name: Generate Checksum
         run: find . -type f -not -path './.*' | xargs sha256sum | sponge | tee sha256.txt
