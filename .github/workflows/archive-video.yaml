@@ -103,6 +103,7 @@ jobs:
         run: echo "branch=archive/${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-${{ strategy.job-index }}-$(openssl rand -hex 8)" | tee -a "${GITHUB_OUTPUT}"
 
       - id: download
+        timeout-minutes: 300
         name: Download
         run: |
           until
