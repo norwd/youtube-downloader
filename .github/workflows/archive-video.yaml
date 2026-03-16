@@ -128,7 +128,6 @@ jobs:
             --print-to-file 'title=%(title)s' "${TMP_GITHUB_OUTPUT}" \
             --print-to-file 'fulltitle=%(fulltitle)s' "${TMP_GITHUB_OUTPUT}" \
             --print-to-file 'alt_title=%(alt_title)s' "${TMP_GITHUB_OUTPUT}" \
-            --print-to-file 'description=%(description)s' "${TMP_GITHUB_OUTPUT}" \
             --print-to-file 'license=%(license)s' "${TMP_GITHUB_OUTPUT}" \
             --print-to-file 'filename=%(filename)s' "${TMP_GITHUB_OUTPUT}" \
             --print-to-file 'filepath=%(filepath)s' "${TMP_GITHUB_OUTPUT}" \
