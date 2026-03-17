@@ -121,32 +121,29 @@ jobs:
             --format "${FORMAT}" --format-sort "filesize:100M" --check-formats \
             --sponsorblock-mark "all" --sponsorblock-remove "sponsor,selfpromo,preview,interaction,outro" \
             --output "%(id)s/%(ext)s/%(title)s.%(ext)s" \
-            --print-to-file 'id=%(id)s' "${TMP_GITHUB_OUTPUT}" \
-            --print-to-file 'display_id=%(display_id)s' "${TMP_GITHUB_OUTPUT}" \
-            --print-to-file 'ext=%(ext)s' "${TMP_GITHUB_OUTPUT}" \
-            --print-to-file 'tags=%(tags)s' "${TMP_GITHUB_OUTPUT}" \
-            --print-to-file 'title=%(title)s' "${TMP_GITHUB_OUTPUT}" \
-            --print-to-file 'fulltitle=%(fulltitle)s' "${TMP_GITHUB_OUTPUT}" \
-            --print-to-file 'alt_title=%(alt_title)s' "${TMP_GITHUB_OUTPUT}" \
-            --print-to-file 'license=%(license)s' "${TMP_GITHUB_OUTPUT}" \
-            --print-to-file 'filename=%(filename)s' "${TMP_GITHUB_OUTPUT}" \
-            --print-to-file 'filepath=%(filepath)s' "${TMP_GITHUB_OUTPUT}" \
-            --print-to-file 'webpage_url=%(webpage_url)s' "${TMP_GITHUB_OUTPUT}" \
-            --print-to-file 'availability=%(availability)s' "${TMP_GITHUB_OUTPUT}" \
-            --print-to-file 'epoch=%(epoch)s' "${TMP_GITHUB_OUTPUT}" \
-            --print-to-file 'timestamp=%(timestamp)s' "${TMP_GITHUB_OUTPUT}" \
-            --print-to-file 'duration=%(duration)s' "${TMP_GITHUB_OUTPUT}" --print-to-file 'duration_string=%(duration_string)s' "${TMP_GITHUB_OUTPUT}" \
-            --print-to-file 'modified_timestamp=%(modified_timestamp)s' "${TMP_GITHUB_OUTPUT}" --print-to-file 'modified_date=%(modified_date)s' "${TMP_GITHUB_OUTPUT}" \
-            --print-to-file 'channel=%(channel)s' "${TMP_GITHUB_OUTPUT}" --print-to-file 'channel_id=%(channel_id)s' "${TMP_GITHUB_OUTPUT}" --print-to-file 'channel_url=%(channel_url)s' "${TMP_GITHUB_OUTPUT}" \
-            --print-to-file 'upload_date=%(upload_date)s' "${TMP_GITHUB_OUTPUT}" --print-to-file 'release_timestamp=%(release_timestamp)s' "${TMP_GITHUB_OUTPUT}" --print-to-file 'release_date=%(release_date)s' "${TMP_GITHUB_OUTPUT}" \
+            --print-to-file 'id=%(id)s' "${GITHUB_OUTPUT}" \
+            --print-to-file 'display_id=%(display_id)s' "${GITHUB_OUTPUT}" \
+            --print-to-file 'ext=%(ext)s' "${GITHUB_OUTPUT}" \
+            --print-to-file 'tags=%(tags)s' "${GITHUB_OUTPUT}" \
+            --print-to-file 'title=%(title)s' "${GITHUB_OUTPUT}" \
+            --print-to-file 'fulltitle=%(fulltitle)s' "${GITHUB_OUTPUT}" \
+            --print-to-file 'alt_title=%(alt_title)s' "${GITHUB_OUTPUT}" \
+            --print-to-file 'license=%(license)s' "${GITHUB_OUTPUT}" \
+            --print-to-file 'filename=%(filename)s' "${GITHUB_OUTPUT}" \
+            --print-to-file 'filepath=%(filepath)s' "${GITHUB_OUTPUT}" \
+            --print-to-file 'webpage_url=%(webpage_url)s' "${GITHUB_OUTPUT}" \
+            --print-to-file 'availability=%(availability)s' "${GITHUB_OUTPUT}" \
+            --print-to-file 'epoch=%(epoch)s' "${GITHUB_OUTPUT}" \
+            --print-to-file 'timestamp=%(timestamp)s' "${GITHUB_OUTPUT}" \
+            --print-to-file 'duration=%(duration)s' "${GITHUB_OUTPUT}" --print-to-file 'duration_string=%(duration_string)s' "${GITHUB_OUTPUT}" \
+            --print-to-file 'modified_timestamp=%(modified_timestamp)s' "${GITHUB_OUTPUT}" --print-to-file 'modified_date=%(modified_date)s' "${GITHUB_OUTPUT}" \
+            --print-to-file 'channel=%(channel)s' "${GITHUB_OUTPUT}" --print-to-file 'channel_id=%(channel_id)s' "${GITHUB_OUTPUT}" --print-to-file 'channel_url=%(channel_url)s' "${GITHUB_OUTPUT}" \
+            --print-to-file 'upload_date=%(upload_date)s' "${GITHUB_OUTPUT}" --print-to-file 'release_timestamp=%(release_timestamp)s' "${GITHUB_OUTPUT}" --print-to-file 'release_date=%(release_date)s' "${GITHUB_OUTPUT}" \
             "${URL}"
             do
-              (sudo service tor restart)
-              sleep 130
-              TMP_GITHUB_OUTPUT="${{ runner.temp }}/${RANDOM}"
+              sudo service tor restart
+              sleep $(shuf --head-count 1 --input-range $((1 * 60))-$((5 * 60)))
             done
-
-            tee -a "${GITHUB_OUTPUT}" < "${TMP_GITHUB_OUTPUT}"
 
       - id: retry
         if: failure() && steps.download.outcome == 'failure' && inputs.retry_count > 0
@@ -160,9 +157,6 @@ jobs:
 
       - name: Split Files greater than 100 Megabytes
         run: find . -size +100M -not -path './.git/*' | xargs --verbose -IFILE split --bytes 100m --hex-suffixes --additional-suffix .split "FILE" "FILE."
-
-      - name: DEBUG
-        run: ls -lR
 
       - name: Generate Checksum
         run: find . -type f -not -path './.*' | xargs sha256sum | sponge | tee sha256.txt
