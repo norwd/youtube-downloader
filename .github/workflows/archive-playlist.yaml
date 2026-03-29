@@ -59,12 +59,17 @@ jobs:
 
       - name: Get Possible Downloads
         run: |
+          until
           yt-dlp "${URL}" \
             --proxy socks5h://localhost:9050 \
             --dump-single-json \
             --ignore-errors \
             --flat-playlist \
           | jq | tee playlist.json
+          do
+            sudo service tor restart
+            sleep $(shuf --head-count 1 --input-range $((1 * 60))-$((5 * 60)))
+          done
 
       - name: Get Missing Downloads
         run: comm -23 <(jq --raw-output "${JQ_QUERY}" playlist.json | sort) existing-downloads.txt | tee missing-downloads.txt
