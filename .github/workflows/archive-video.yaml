@@ -106,7 +106,6 @@ jobs:
         timeout-minutes: 300
         name: Download
         run: |
-          TMP_GITHUB_OUTPUT="${{ runner.temp }}/${RANDOM}"
           until
           yt-dlp \
             --no-simulate \
