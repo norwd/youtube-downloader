@@ -54,8 +54,8 @@ jobs:
       - name: Get Existing Downloads
         run: gh api "${ENDPOINT}" --paginate --jq "${JQ_QUERY}" | sort | tee existing-downloads.txt
         env:
-          ENDPOINT: '/repos/${{ vars.repository }}/contents'
-          JQ_QUERY: '.[].path'
+          ENDPOINT: '/repos/${{ vars.repository }}/git/trees/main'
+          JQ_QUERY: '.tree[].path'
 
       - name: Get Possible Downloads
         run: |
