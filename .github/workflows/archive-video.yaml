@@ -88,7 +88,7 @@ jobs:
         run: curl -fsSL https://deno.land/install.sh | sh
 
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{ secrets.ref || 'main' }}
           token: ${{ secrets.AUTO_DOWNLOAD }}
