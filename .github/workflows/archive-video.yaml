@@ -75,6 +75,11 @@ jobs:
           chmod a+rx ~/.local/bin/yt-dlp
           yt-dlp --update-to nightly
 
+      - name: Install jaq
+        run: |
+          curl -fsSL https://github.com/01mf02/jaq/releases/latest/download/jaq-$(uname -m)-unknown-linux-musl -o ~/.local/bin/jaq
+          chmod +x jaq
+
       - name: Install tor
         run: sudo apt install -y tor
 
@@ -165,7 +170,7 @@ jobs:
         run: find . -size +100M -not -path './.git/*' | xargs --verbose -IFILE rm -rf FILE
 
       - name: Metadata
-        run: jq "${JQ_QUERY}" <<< "${METADATA}" | tee metadata.json
+        run: jaq "${JQ_QUERY}" <<< "${METADATA}" | tee metadata.json
         working-directory: ${{ steps.download.outputs.id }}
         env:
           METADATA: ${{ toJSON(steps.download.outputs) }}
