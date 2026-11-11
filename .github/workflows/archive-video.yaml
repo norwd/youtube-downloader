@@ -67,47 +67,49 @@ jobs:
       - name: Prepare
         run: sudo apt-get update --fix-missing
 
-      - name: Install yt-dlp
-        run: |
-          mkdir -p ~/.local/bin
-          echo "~/.local/bin" >> "$GITHUB_PATH"
-          curl -fsSL https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o ~/.local/bin/yt-dlp
-          chmod a+rx ~/.local/bin/yt-dlp
-          yt-dlp --update-to nightly
+      - id: target
+        name: Determine Target
+        run: echo "branch=archive/${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-${{ strategy.job-index }}-$(openssl rand -hex 8)" | tee -a "${GITHUB_OUTPUT}"
 
-      - name: Install jaq
-        run: |
-          mkdir -p ~/.local/bin
-          echo "~/.local/bin" >> "$GITHUB_PATH"
-          curl -fsSL https://github.com/01mf02/jaq/releases/latest/download/jaq-x86_64-unknown-linux-musl -o ~/.local/bin/jaq
-          chmod a+rx ~/.local/bin/jaq
+      - parallel:
 
-      - name: Install tor
-        run: sudo apt install -y tor
+        - name: Install yt-dlp
+          run: |
+            mkdir -p ~/.local/bin
+            echo "~/.local/bin" >> "$GITHUB_PATH"
+            curl -fsSL https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o ~/.local/bin/yt-dlp
+            chmod a+rx ~/.local/bin/yt-dlp
+            yt-dlp --update-to nightly
 
-      - name: Install ffmpeg
-        run: sudo apt install -y ffmpeg
+        - name: Install jaq
+          run: |
+            mkdir -p ~/.local/bin
+            echo "~/.local/bin" >> "$GITHUB_PATH"
+            curl -fsSL https://github.com/01mf02/jaq/releases/latest/download/jaq-x86_64-unknown-linux-musl -o ~/.local/bin/jaq
+            chmod a+rx ~/.local/bin/jaq
 
-      - name: Install moreutils
-        run: sudo apt install -y moreutils
+        - name: Install tor
+          run: sudo apt install -y tor
 
-      - name: Install deno
-        run: curl -fsSL https://deno.land/install.sh | sh
+        - name: Install ffmpeg
+          run: sudo apt install -y ffmpeg
 
-      - name: Checkout
-        uses: actions/checkout@v7
-        with:
-          ref: ${{ secrets.ref || 'main' }}
-          token: ${{ secrets.AUTO_DOWNLOAD }}
-          repository: ${{ env.REPO }}
+        - name: Install moreutils
+          run: sudo apt install -y moreutils
+
+        - name: Install deno
+          run: curl -fsSL https://deno.land/install.sh | sh
+
+        - name: Checkout
+          uses: actions/checkout@v7
+          with:
+            ref: ${{ secrets.ref || 'main' }}
+            token: ${{ secrets.AUTO_DOWNLOAD }}
+            repository: ${{ env.REPO }}
 
       - id: restart
         name: Restart
         run: sudo service tor restart && sleep 15
-
-      - id: target
-        name: Determine Target
-        run: echo "branch=archive/${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-${{ strategy.job-index }}-$(openssl rand -hex 8)" | tee -a "${GITHUB_OUTPUT}"
 
       - id: download
         timeout-minutes: 300
