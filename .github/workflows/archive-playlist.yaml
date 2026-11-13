@@ -38,24 +38,25 @@ jobs:
     
     steps:
 
-      - name: Prepare
-        run: sudo apt-get update --fix-missing
+      - parallel:
 
-      - name: Install yt-dlp
-        run: |
-          mkdir -p ~/.local/bin
-          echo "~/.local/bin" >> "$GITHUB_PATH"
-          curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o ~/.local/bin/yt-dlp
-          chmod a+rx ~/.local/bin/yt-dlp
+        - name: Install yt-dlp
+          run: |
+            mkdir -p ~/.local/bin
+            echo "~/.local/bin" >> "$GITHUB_PATH"
+            curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o ~/.local/bin/yt-dlp
+            chmod a+rx ~/.local/bin/yt-dlp
 
-      - name: Install tor
-        run: sudo apt install -y tor
+        - name: Install tor
+          run: |
+            sudo apt-get update --fix-missing
+            sudo apt install -y tor
 
-      - name: Get Existing Downloads
-        run: gh api "${ENDPOINT}" --paginate --jq "${JQ_QUERY}" | sort | tee existing-downloads.txt
-        env:
-          ENDPOINT: '/repos/${{ vars.repository }}/git/trees/main'
-          JQ_QUERY: '.tree[].path'
+        - name: Get Existing Downloads
+          run: gh api "${ENDPOINT}" --paginate --jq "${JQ_QUERY}" | sort | tee existing-downloads.txt
+          env:
+            ENDPOINT: '/repos/${{ vars.repository }}/git/trees/main'
+            JQ_QUERY: '.tree[].path'
 
       - name: Get Possible Downloads
         run: |
