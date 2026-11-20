@@ -88,14 +88,8 @@ jobs:
             curl -fsSL https://github.com/01mf02/jaq/releases/latest/download/jaq-x86_64-unknown-linux-musl -o ~/.local/bin/jaq
             chmod a+rx ~/.local/bin/jaq
 
-        - name: Install tor
-          run: sudo apt install -y tor
-
-        - name: Install ffmpeg
-          run: sudo apt install -y ffmpeg
-
-        - name: Install moreutils
-          run: sudo apt install -y moreutils
+        - name: Install pkgs
+          run: sudo apt install -y tor ffmpeg moreutils
 
         - name: Install deno
           run: curl -fsSL https://deno.land/install.sh | sh
